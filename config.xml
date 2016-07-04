@@ -46,7 +46,7 @@
     <plugin spec="https://github.com/Initsogar/cordova-webintent.git" source="git" />
     <plugin name="cordova-plugin-keepe-cardio" source="npm" />
     <plugin name="cordova-plugin-app-version" source="npm" />
-    <plugin name="de.appplant.cordova.plugin.background-mode" version="0.6.3" />
+    <plugin name="cordova-plugin-background-mode" version="0.6.3" />
     <plugin name="cordova-plugin-compat" source="npm" />
     <plugin name="cordova-plugin-device" source="npm" />
     <plugin name="cordova-plugin-dialogs" source="npm" />
