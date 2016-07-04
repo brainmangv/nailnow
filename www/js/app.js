@@ -68,7 +68,7 @@
         
         document.addEventListener("backbutton", function(e){
             console.log('backbutton');
-            if($.afui.activeDiv.id='main'){
+            if($.afui.activeDiv.id=='main'){
                 e.preventDefault();
                 navigator.app.exitApp();
             }
