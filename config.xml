@@ -59,7 +59,7 @@
     <plugin spec="https://github.com/Viras-/cordova-plugin-powermanagement.git" source="git" />
 
     <plugin name="phonegap-plugin-push" source="npm" >    
-        <variable name="SENDER_ID" value="499027471276"/>
+        <param name="SENDER_ID" value="499027471276"/>
     </plugin>
 
     <plugin name="cordova-plugin-facebook4" spec="~1.7.1">
