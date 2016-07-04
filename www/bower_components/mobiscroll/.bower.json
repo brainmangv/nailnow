@@ -1,0 +1,57 @@
+{
+  "name": "mobiscroll",
+  "version": "2.17.1",
+  "main": [
+    "js/mobiscroll.core.js",
+    "js/mobiscroll.frame.js",
+    "js/mobiscroll.scroller.js",
+    "js/mobiscroll.util.datetime.js",
+    "js/mobiscroll.datetimebase.js",
+    "js/mobiscroll.datetime.js",
+    "js/mobiscroll.select.js",
+    "js/mobiscroll.listbase.js",
+    "js/mobiscroll.treelist.js",
+    "js/mobiscroll.image.js",
+    "css/mobiscroll.animation.css",
+    "css/mobiscroll.frame.css",
+    "css/mobiscroll.scroller.css"
+  ],
+  "description": "A wheel scroller control optimized for touchscreens to easily enter date/time. It can easily be customized to support any custom values.",
+  "keywords": [
+    "ui",
+    "input",
+    "form",
+    "html5",
+    "mobile",
+    "list",
+    "hierarchy",
+    "scroller",
+    "clickpick"
+  ],
+  "authors": [
+    {
+      "name": "Acid Media"
+    },
+    {
+      "homepage": "http://theacidmedia.net"
+    }
+  ],
+  "ignore": [
+    ".git",
+    ".gitignore"
+  ],
+  "dependencies": {
+    "jquery": ">=1.7"
+  },
+  "homepage": "http://mobiscroll.com/",
+  "_release": "2.17.1",
+  "_resolution": {
+    "type": "version",
+    "tag": "v2.17.1",
+    "commit": "ea7ce1e0e55022941a58a2c721a4dd529f2c4011"
+  },
+  "_source": "https://github.com/acidb/mobiscroll.git",
+  "_target": "2.17.1",
+  "_originalSource": "mobiscroll",
+  "_direct": true
+}

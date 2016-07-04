@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NailNow</title>    
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">  
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src * 'self' data: gap: 'unsafe-eval' 'unsafe-inline'; 
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' *; 
+        style-src  'self' 'unsafe-inline' *;
+        font-src 'self' 'unsafe-inline' data: *;
+        img-src data: *" >
+    <!-- meta http-equiv="Content-Security-Policy" content="
+    default-src * 'self' data: gap: http://cdnjs.cloudflare.com http://* https://*.googleapis.com https://*.gstatic.com 'unsafe-eval' 'unsafe-inline';     
+    style-src 'self' https://*.googleapis.com http://cdnjs.cloudflare.com *.klokantech.com 'unsafe-inline';
+    media-src *;
+    img-src * " -->
+
+    <!-- see http://webdesign.tutsplus.com/tutorials/htmlcss-tutorials/quick-tip-dont-forget-the-viewport-meta-tag -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+
+    <link rel="stylesheet" type="text/css" href="icon-fonts/elusive-icons-2.0.0/css/elusive-icons.css">
+    <link rel="stylesheet" type="text/css" href="icon-fonts/font-awesome-4.3.0/css/font-awesome.css">
+    <link rel="stylesheet" type="text/css" href="lib/jquery/ui/jquery-ui.min.css">    
+    <link rel="stylesheet" type="text/css" href="app_framework/3.0/af.ui.css" data-ver="2">
+    <link rel="stylesheet" type="text/css" href="app_framework/3.0/icons.min.css">
+    <link rel="stylesheet" type="text/css" href="lib/datetimepicker/jquery.datetimepicker.css">  
+    <link rel="stylesheet" type="text/css" href="css/app.css">
+    
+    <style>
+        /* following two viewport lines are equivalent to the meta viewport statement above, needed for Windows */
+        /* see http://www.quirksmode.org/blog/archives/2014/05/html5_dev_conf.html and http://dev.w3.org/csswg/css-device-adapt/ */
+        @-ms-viewport { width: 100vw ; zoom: 100% ; }  @viewport { width: 100vw ; zoom: 100% ; }
+        @-ms-viewport { user-zoom: fixed ; }           @viewport { user-zoom: fixed ; }    
+        
+    </style>    
+    <script src="xdk/init-dev.js"></script>     <!-- normalizes device and document ready events, see README for details -->
+    <script type="application/javascript" src="lib/jquery/jquery-1.10.2.min.js"></script>
+    <script src="lib/jquery/ui/jquery-ui-1.11.4.custom.min.js"></script>    
+    <script src="lib/jquery/jquery.ui.touch-punch.min.js"></script>     
+    <script type="application/javascript" src="app_framework/3.0/appframework.ui.js"></script>
+    <script type="text/javascript" src="app_framework/pageChangeRepeater.js"></script>
+    <script type="text/javascript" src="js/find-prototype.js"></script>    
+    <script type="application/javascript">
+        $.afui.autoLaunch = false; //By default, it is set to true and you're app will run right away.  We set it to false to show a splashscreen
+        /* This function runs when the content is loaded.*/
+        $.afui.useOSThemes=false;
+         $(document).ready(function(){
+            setTimeout(function(){
+                $.afui.launch();
+            },100);
+        });
+    </script>
+    
+    <script type="application/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCw-1K3hDJDFhDnujklziKhIVNbLFdjIfk&amp;libraries=places&amp;signed_in=false" defer=""></script>
+    <script type="application/javascript" src="js/rest-of-space.js"></script>
+    <script type="application/javascript" src="lib/datetimepicker/jquery.datetimepicker.full.js"></script>
+    
+    <!-- Mobiscroll JS and CSS Includes -->
+    <script src="bower_components/mobiscroll/js/mobiscroll.core.js"></script>
+    <script src="bower_components/mobiscroll/js/mobiscroll.frame.js"></script>
+    <script src="bower_components/mobiscroll/js/mobiscroll.scroller.js"></script>
+    <script src="bower_components/mobiscroll/js/mobiscroll.util.datetime.js"></script>
+    <script src="bower_components/mobiscroll/js/mobiscroll.datetimebase.js"></script>
+    <script src="bower_components/mobiscroll/js/mobiscroll.datetime.js"></script>
+    <script src="bower_components/mobiscroll/js/mobiscroll.frame.android.js"></script>
+    <script src="bower_components/mobiscroll/js/i18n/mobiscroll.i18n.pt-BR.js"></script>
+
+    <link href="bower_components/mobiscroll/css/mobiscroll.animation.css" rel="stylesheet" type="text/css" />
+    <link href="bower_components/mobiscroll/css/mobiscroll.icons.css" rel="stylesheet" type="text/css" />
+    <link href="bower_components/mobiscroll/css/mobiscroll.frame.css" rel="stylesheet" type="text/css" />
+    <link href="bower_components/mobiscroll/css/mobiscroll.frame.android.css" rel="stylesheet" type="text/css" />    
+    <link href="bower_components/mobiscroll/css/mobiscroll.scroller.css" rel="stylesheet" type="text/css" />
+    <link href="bower_components/mobiscroll/css/mobiscroll.scroller.android.css" rel="stylesheet" type="text/css" />   
+
+    <script src="bower_components/mobiscroll/js/i18n/mobiscroll.i18n.pt-BR.js"></script>    
+    <link href="lib/mprogress/mprogress.min.css" rel="stylesheet" type="text/css"/>    
+    <script src="lib/mprogress/mprogress.min.js"></script>    
+</head>
+
+<body  id="afui" class="v2 ios7">
+    <audio id="beepSound" src="sound/beep.mp3" type="audio/mpeg" ></audio>
+    <div id="fb-root"></div>
+    
+    <div id="splashscreen" class='ui-loader'>
+        <figure class="figure-align">
+            <img src="icones/logo-home.png">
+            <figcaption data-position="bottom"></figcaption>
+        </figure>
+        <br><br>
+        <div class="ui-loader">
+            <span class='ui-icon ui-icon-loading spin'></span><h1 >Starting app</h1>
+        </div>
+    </div>
+
+    <div class="view" id="mainview">
+        <header id="af-header-0">
+            <a href="javascript:;" class="button backButton" style="visibility: hidden; ">Voltar</a>
+            <h1 id="pageTitle"></h1>
+        </header>        
+        <div class="pages">
+            <!--main -->
+            <div id="main" class="upage-content vertical-col panel active" data-title=" " data-header="none" data-footer="none">
+                <div class="grid grid-pad urow uib_row_7 row-height-7" data-uib="layout/row" data-ver="0">
+                    <div class="col uib_col_11 col-0_12-12" data-uib="layout/col" data-ver="0">
+                        <div class="widget-container content-area vertical-col">
+                            <div class="widget d-margins vcenter-logo-home" data-uib="media/img" data-ver="0">
+                                <figure class="figure-align">
+                                    <img src="images/logo-home.png">
+                                    <figcaption data-position="bottom"></figcaption>
+                                </figure>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="uib_shim"></span>
+                </div>
+                <div class="grid grid-pad urow btn-row-align-bottom uib_row_8" data-uib="layout/row" data-ver="0">
+                    <div class="col uib_col_14 col-0_6-12" data-uib="layout/col" data-ver="0">
+                        <div class="widget-container content-area vertical-col">
+                            <button class="button d-margins btn-pink btn-padding" href="#login" data-transition="slide">LOGIN</a>
+                            <span class="uib_shim"></span>
+                        </div>
+                    </div>
+                    <div class="col uib_col_15 col-0_6-12" data-uib="layout/col" data-ver="0">
+                        <div class="widget-container content-area vertical-col">
+                            <a class="button d-margins btn-black btn-padding" href="#registrar-tipo" data-transition="slide">REGISTRAR</a>
+                            <span class="uib_shim"></span>
+                        </div>
+                    </div>
+
+                    <span class="uib_shim"></span>
+                </div>
+            </div> <!-- /main -->
+            
+            <!-- login -->
+            <div id="login" class="upage-content vertical-col hidden panel" data-title="Login" data-header="af-header-0" data-footer="login-footer">
+                <div class="grid grid-pad urow uib_row_2 row-height-2" data-uib="layout/row" data-ver="0">
+                    <div class="col uib_col_2 col-0_12-12" data-uib="layout/col" data-ver="0">
+                        <form id="frm_login" action="#">
+                            <div class="widget-container content-area vertical-col">
+
+                                <p class="d-margins widget center background-line" data-ver="0">
+                                    <span>Entrar</span>
+                                </p>
+
+                                <a class="button d-margins btn-facebook btn-padding" id="btn-facebook-login">CONTINUAR COM O FACEBOOK</a>
+                                
+                                <p class="d-margins widget center background-line" data-ver="0" name="uib_w_23">
+                                    <span>Ou conecte-se com seu Email</span>
+                                </p>
+                                <div class="table-thing with-label widget uib_w_8 input" data-uib="app_framework/input" data-ver="1">
+                                    <label class="narrow-control label-top-left">EMAIL</label>
+
+                                    <input class="wide-control" placeholder="email" type="text" name="login_email" id="login_email">
+                                </div>
+                                <div class="table-thing with-label widget uib_w_9" data-uib="app_framework/input" data-ver="1">
+                                    <label class="narrow-control label-top-left">SENHA</label>
+
+                                    <input class="wide-control" placeholder="senha" type="text" name="login_senha" id="login_senha">
+                                </div>
+                                <a class="button d-margins btn-pink btn-padding" id="btn-login2">LOGIN</a>
+                                <span class="uib_shim"></span>
+                            </div>
+                        </form>
+                    </div>
+                    <span class="uib_shim"></span>
+                </div>                
+            </div>            
+
+            <!-- registrar-tipo -->
+            <div id="registrar-tipo" class="upage-content vertical-col hidden panel" data-title="Registrar" data-header="af-header-0" data-footer="none">
+                <div class="grid grid-pad urow uib_row_3 row-height-3" data-uib="layout/row" data-ver="0">
+                    <div class="col uib_col_3 col-0_12-12" data-uib="layout/col" data-ver="0">
+                        <ul class="list widget uib_w_48 d-margins" data-uib="app_framework/listview" data-ver="2">
+                            <li class="widget uib_w_49" data-uib="app_framework/listitem" data-ver="2"><a id="btn-registrar-cliente" ><i class="fa fa-user"></i>&nbsp; Sou Cliente</a>
+                            </li>
+                            <li class="widget uib_w_50" data-uib="app_framework/listitem" data-ver="2"><a id="btn-registrar-manicure"><i class="fa fa-briefcase"></i>&nbsp; Sou Manicure</a>
+                            </li>                            
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- registrar -->
+            <div id="registrar" class="upage-content vertical-col hidden panel" data-title="Registrar" data-heade
+            r="af-header-0" data-footer="none">
+                <div class="grid grid-pad urow uib_row_3 row-height-3" data-uib="layout/row" data-ver="0">
+                    <div class="col uib_col_3 col-0_12-12" data-uib="layout/col" data-ver="0">
+                        <form id="frm_registrar" action="#">
+                        <div class="widget-container content-area vertical-col">
+
+                            <a class="button d-margins btn-facebook btn-padding" id="btn-facebook-registrar">CADASTRAR COM O FACEBOOK</a>
+                            <p class="d-margins widget center background-line" data-ver="0" name="uib_w_23">
+                                <span>Ou use seu Email</span>
+                            </p>                                    
+                            <div class="table-thing with-label widget uib_w_13" data-uib="app_framework/input" data-ver="1">
+                                <label class="narrow-control label-top-left" for="reg_nome">NOME</label>
+                                <input class="wide-control" placeholder="Nome" type="text" name="reg_nome" id="reg_nome" required>
+                            </div>
+                            <div class="table-thing with-label widget uib_w_14" data-uib="app_framework/input" data-ver="1">
+                                <label class="narrow-control label-top-left" for="reg_email">EMAIL</label>
+                                <input class="wide-control" placeholder="nome@exemplo.com" type="email" name="reg_email" id="reg_email" required>
+                            </div>
+
+                            <div class="table-thing with-label widget uib_w_14" data-uib="app_framework/input" data-ver="1">
+                                <label class="narrow-control label-top-left" for="reg_telefone">TELEFONE</label>
+                                <input class="wide-control" placeholder="Seu telefone com DDD" type="tel" name="reg_telefone" id="reg_telefone" required>
+                            </div>
+
+                            <div class="table-thing with-label widget uib_w_16" data-uib="app_framework/input" data-ver="1">
+                                <label class="narrow-control label-top-left" for="reg_senha">SENHA</label>
+                                <input class="wide-control" placeholder="no minimo 8 caracteres" type="password" name="reg_senha" id="reg_senha">
+                            </div>
+                            <div class="table-thing with-label widget uib_w_17" data-uib="app_framework/input" data-ver="1">
+                                <label class="narrow-control label-top-left" for="reg_confirme_senha">CONFIRME A SENHA</label>
+                                <input class="wide-control" placeholder="confirme a senha" type="password" name="reg_confirme_senha" id="reg_confirme_senha" >
+                            </div>
+
+                            <a class="button d-margins btn-pink btn-padding" data-uib="app_framework/button" data-ver="1" id="btn-registrou" data-page-type="document_page" data-transition="slide">REGISTRAR</a>
+                            <span class="uib_shim"></span>
+                            <span class="uib_shim"></span>
+                            <p> Ao finalizar esse processo, você sinaliza que leu e concordou com nossos <a href="#" class="btn-termos-uso">termos de uso</a>.</p>
+                        </div>
+                        </form>
+                    </div>
+                    <span class="uib_shim"></span>
+                </div>
+            </div> <!-- /registrar -->
+
+            <!-- confirmação telefone-->
+            <div id="confirmacao-telefone" class="upage-content panel vertical-col" data-title="Confirmação do Telefone" data-header="af-header-1" >
+                <div class="grid grid-pad urow vertical-col">
+                </div>
+            </div>
+
+            <!-- termos de uso -->
+            <div id="termos-uso" class="upage-content vertical-col left panel ac0" data-header="af-header-0" data-title="Termos de Uso">
+                <div class="grid grid-pad urow uib_row_10 row-height-10" data-uib="layout/row" data-ver="0">
+                    <div class="col uib_col_17 col-0_12-12" data-uib="layout/col" data-ver="0">
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis ultricies nec mi eget auctor. In finibus pulvinar nulla eget commodo. Pellentesque consequat turpis quis turpis faucibus, quis venenatis nibh pharetra. Quisque vel faucibus magna. Curabitur tellus magna, hendrerit quis eleifend sit amet, molestie sit amet lacus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Quisque ut lacus cursus, eleifend quam ac, accumsan ligula. Proin turpis nisi, mattis in purus ut, ultrices congue lectus. Donec venenatis, tellus ac pretium fringilla, dui nunc semper dolor, vitae bibendum nulla leo at ligula. Curabitur semper felis in dapibus sagittis. Integer in semper eros. Nullam aliquet urna non tellus faucibus dapibus.</p>
+                        <p>Vestibulum molestie rutrum augue at tempus. Donec consequat arcu eu lorem vestibulum, et laoreet est ornare. In et dolor sit amet ex aliquam dapibus. Fusce venenatis accumsan metus et aliquet. Nunc elementum massa leo, vel pharetra tellus aliquet convallis. Phasellus tincidunt non elit ullamcorper lacinia. Cras justo leo, mollis dignissim enim porta, ultrices lobortis ipsum. Duis interdum congue viverra. Sed a sagittis quam, vel faucibus metus. Vivamus quam nunc, auctor eu egestas non, volutpat in libero. Curabitur id ultricies ante, a consectetur justo. Donec et mollis purus, vitae tincidunt velit. Fusce ac felis dui. Sed efficitur nec turpis sit amet maximus.</p>
+                        <p>Morbi rutrum sapien sodales ipsum mollis congue. Etiam nec sapien mi. In hac habitasse platea dictumst. Integer eget tempus nisi. Nullam tristique porta risus eget elementum. Cras semper ac sem eget convallis. Ut id consectetur orci, ullamcorper lacinia sem. Sed vel rutrum tortor, id aliquam libero. Pellentesque eu porta quam. Donec erat lacus, ultricies non scelerisque id, lacinia sed velit. Mauris tortor lorem, efficitur non facilisis vel, mollis sit amet est. Integer maximus dictum ante, ac interdum massa fringilla ut.</p>
+                        <p>Vivamus at accumsan lorem. Sed lacinia mauris ut maximus eleifend. Aliquam et nulla erat. Nam sit amet semper arcu. Aenean lacinia vitae lectus non cursus. Fusce dapibus euismod enim, at cursus dolor ultrices ut. Curabitur ut est sed tellus auctor sodales.</p>
+                        <p>Nam ultricies lectus semper blandit lacinia. Duis ac dolor sodales, dictum magna eget, fringilla lacus. Quisque maximus, velit non iaculis euismod, diam justo tincidunt lectus, id egestas elit turpis in mauris. Integer id magna non eros maximus pretium. Nulla ullamcorper velit sit amet tortor tempor, fermentum cursus dui blandit. Quisque sit amet aliquam dui. Donec condimentum, ex sed laoreet placerat, lorem nulla iaculis neque, at ornare erat felis ac est. Aliquam at tortor faucibus, tempor neque porttitor, tempor neque. Donec dapibus ultricies odio varius iaculis. Cras tincidunt nisi sed erat commodo, at dapibus arcu iaculis. Suspendisse fringilla tincidunt ex, eget egestas arcu commodo non. Proin nec molestie magna, sed pharetra purus. Nunc ac libero vestibulum, volutpat risus ut, porttitor lorem.</p>
+                    </div>
+                </div>
+            </div>
+        </div>                     
+    </div> <!-- /mainview -->
+
+    
+    <!-- Mapview-->
+    <div class="upage view" id="mapview"  data-footer="none">
+        <header id="af-header-1">
+            <div class="widget-container wrapping-col single-centered">
+                <div class="widget margin-header-logo" data-uib="media/img" data-ver="0" id="logo-header">
+                    <figure class="figure-align">
+                        <img src="images/logo-header.png">
+                        <figcaption data-position="bottom"></figcaption>
+                    </figure>
+                </div>
+            </div>
+            <a class="button el el-lines" data-transition="cover" data-left-menu="uib_w_47" id="btn_menu"></a>
+            <h1></h1>
+        </header>
+
+        <div class="pages">
+            <!-- Mapa -->
+            <div class="upage-content vertical-col left panel ac0" id="mapa" data-title=" " data-header="af-header-1" data-footer="none">
+                <input id="pac-input" class="controls" type="text" placeholder="Box de Pesquisa">
+                <div class="map-float-box hide-float-box">
+                    <span><a id="btn-pedir">PEDIR MANICURE AQUI</a><i class="fa fa-chevron-right fa-1x"></i></span>
+                </div>
+                <div id="pin" class="map-pin"></div>
+                <div id="map-canvas" data-uib="media/google_maps"></div>
+                <div id="map-footer">                
+                    <ul class="slider_texto"><li>Pedir Agora</li> <li class="op2">Agendar</li></ul>                    
+                    <div id="slider"></div>                    
+                </div>                
+            </div>
+
+            <!-- confirmação Agendamento-->
+            <div class="upage-content panel vertical-col confirmacao" data-title="Confirmação" data-header="af-header-1" id="confirmacao-agendamento">
+                <div id="pin2" class="map-pin"></div>
+                <img id="static-map-agendamento"></img>
+                <div class="grid grid-pad urow vertical-col">
+                        <h1><i class="fa fa-map-marker fa-1x" aria-hidden="true"></i>Endereço de atendimento</h1>
+                        <div class="col col2-3">
+                            <input class="wide-control" placeholder="Endereço" type="text" id="conf_endereco">
+                        </div>
+                        <div class="col last col1-3">
+                            <input class="wide-control" placeholder="Numero" type="text" id="conf_numero">
+                        </div>
+                        <!--
+                        <div class="col col2-3">
+                            <input class="wide-control" placeholder="Cidade" type="text" id="conf_cidade">
+                        </div>
+                        <div class="col last col1-3">
+                            <input class="wide-control" placeholder="Bairro" type="text" id="conf_bairro">
+                        </div>
+                        <input class="wide-control" placeholder="Ponto de referencia" type="text" id="conf_p_referencia">
+                        <span class="uib_shim"></span>
+                        -->
+                        <h1><i class="fa fa-credit-card fa-1x" aria-hidden="true"></i>Pagamento</h1>
+                        <div class="cartao-credito">
+                            <img src="images/visa.png"><p>CARTÃO FINAL ... 456</p>    
+                        </div>
+                        <!--input class="wide-control" placeholder="Numero do Cartão" type="text" id="conf_pgto" readonly="true">
+                         <!-- 
+                        <h1><i class="fa fa-calendar fa-1x" aria-hidden="true"></i>Data</h1>
+                        <input class="wide-control" placeholder="Data" type="text" id="conf_data">
+
+                        <h1><i class="fa fa-clock-o fa-1x" aria-hidden="true"></i>Horario</h1>
+                        <select id="conf_hora">
+                            <option>Selecione</option>
+                            <option>9:00</option>
+                            <option>9:30</option>
+                            <option>10:00</option>
+                            <option>10:30</option>
+                            <option>11:00</option>
+                            <option>11:30</option>
+                            <option>12:00</option>
+                            <option>12:30</option>
+                            <option>13:00</option>
+                            <option>13:30</option>
+                            <option>14:00</option>
+                            <option>14:30</option>
+                            <option>15:00</option>
+                        </select>
+
+                        <h1><i class="fa fa-clock-o fa-1x" aria-hidden="true"></i>Serviço</h1>
+                        <select id="conf_servicos" multiple>
+                            <option>Selecione</option>
+                            <option>9:00</option>
+                            <option>9:30</option>
+                            <option>10:00</option>
+                            <option>10:30</option>
+                            <option>11:00</option>
+                            <option>11:30</option>
+                            <option>12:00</option>
+                            <option>12:30</option>
+                            <option>13:00</option>
+                            <option>13:30</option>
+                            <option>14:00</option>
+                            <option>14:30</option>
+                            <option>15:00</option>
+                        </select>
+                        -->
+                        <!--input class="wide-control" placeholder="Horario" type="text" id="conf_hora" -->
+                </div>
+                <div class="grid grid-pad urow vertical-col btn-row-align-bottom">
+                    <a href="#confirmacao-servico" data-transition="slide" class="button btn-pink">CONTINUAR</a>
+                </div>
+                <span class="uib_shim"></span>               
+            </div>
+            
+            <!-- confirmação Pedido Agora-->
+            <div class="upage-content panel vertical-col confirmacao" data-title="Confirmação" data-header="af-header-1" id="confirmacao-agora">
+                <div class="map-pin"></div>
+                <img id="static-map-confirmacao"></img>
+                <div class="grid grid-pad urow vertical-col">                        
+                    <div id="map-footer-pedido">
+                        <p>CARTÃO VISA ...456</p>
+                        <P>Serviços</P>
+                        <input type="" name="">
+                        <a href="button btn-black">PEDIR AGORA</a>    
+                    </div>
+                        <h1><i class="fa fa-map-marker fa-1x" aria-hidden="true"></i>Endereço de atendimento</h1>
+                        <div class="col col2-3">
+                            <input class="wide-control" placeholder="Endereço" type="text" id="conf_endereco">
+                        </div>
+                        <div class="col last col1-3">
+                            <input class="wide-control" placeholder="Numero" type="text" id="conf_numero">
+                        </div>
+                        <div class="col col2-3">
+                            <input class="wide-control" placeholder="Cidade" type="text" id="conf_cidade">
+                        </div>
+                        <div class="col last col1-3">
+                            <input class="wide-control" placeholder="Bairro" type="text" id="conf_bairro">
+                        </div>
+                        <input class="wide-control" placeholder="Ponto de referencia" type="text" id="conf_p_referencia">
+                        <span class="uib_shim"></span>
+                        
+                        <h1><i class="fa fa-credit-card fa-1x" aria-hidden="true"></i>Pagamento</h1>
+                        <input class="wide-control" placeholder="Numero do Cartão" type="text" id="conf_pgto" readonly="true">
+                          
+                        <h1><i class="fa fa-calendar fa-1x" aria-hidden="true"></i>Data</h1>
+                        <input class="wide-control" placeholder="Data" type="text" id="conf_data">
+
+                        <h1><i class="fa fa-clock-o fa-1x" aria-hidden="true"></i>Serviço</h1>
+                        <select id="conf_servicos" multiple>
+                            <option>Selecione</option>
+                            <option>Manicure</option>
+                            <option>9:30</option>
+                            <option>10:00</option>
+                            <option>10:30</option>
+                            <option>11:00</option>
+                            <option>11:30</option>
+                            <option>12:00</option>
+                            <option>12:30</option>
+                            <option>13:00</option>
+                            <option>13:30</option>
+                            <option>14:00</option>
+                            <option>14:30</option>
+                            <option>15:00</option>
+                        </select>
+                        <!--input class="wide-control" placeholder="Horario" type="text" id="conf_hora" -->
+                        <a class="button btn-pink disabled" id="btn-pedido-agora">CONTINUAR</a>
+                        <span class="uib_shim"></span>
+                </div>
+                <span class="uib_shim"></span>               
+            </div>
+            
+            <!-- confirmação selecione serviço-->
+            <div class="upage-content panel vertical-col confirmacao" data-title="Serviços" data-header="af-header-1" id="confirmacao-servico">                        
+                <div class="grid grid-pad urow list-item" class="list-item" style="text-align: center;">
+                    <p>Selecione os Servicos e a quantidade de atendimentos.</p>
+                </div>                
+                <div id="lista-servicos"></div>                
+
+                <div class="grid grid-pad urow vertical-col btn-row-align-bottom">
+                    <a class="button btn-pink" id="btn-sel-servico">CONTINUAR</a>
+                </div>
+                <span class="uib_shim"></span>               
+            </div>
+            <!-- Adicionar Cartão-->
+            <div class="upage-content panel vertical-col" data-title="Adicionar pagamento" data-header="af-header-1" id="add_cartao">
+            <div class="grid grid-pad urow vertical-col">
+                <div class="col col2-3">
+                    <input class="wide-control" type="number" id="num_cartao" placeholder="Numero do cartão de crédito">
+                </div>
+                <div class="col last col1-3">
+                    <a class="button icon camera btn-pink" id="btn_digitalizar"></a>
+                </div>
+                <div class="col col1-3">
+                    <input type="number" id="carta_mes" placeholder="MM">
+                </div>
+                <div class="col last col1-3">
+                    <input type="number" id="carta_ano" placeholder="AA">
+                </div>
+                <div class="col last col1-3">
+                    <input type="number" id="carta_cvv" placeholder="CVV">
+                </div>
+                <a class="button btn-pink btn-padding">Adicionar Pagamento</a>               
+                </div>
+            </div>            
+
+            <!-- Editar Conta -->
+            <div class="upage-content vertical-col left panel ac0" id="editar_conta" data-header="af-header-1" data-title="Editar Conta">
+                <div class="grid grid-pad urow uib_row_10 row-height-10" data-uib="layout/row" data-ver="0">
+                    <div class="col uib_col_17 col-0_12-12" data-uib="layout/col" data-ver="0">
+                        <div class="widget-container content-area vertical-col">
+                            <div class="table-thing with-label widget uib_w_59" data-uib="app_framework/input" data-ver="1">
+                                <label class="narrow-control label-top-left">NOME</label>
+                                <input class="wide-control" placeholder="Nome" type="text">
+                            </div>
+                            <div class="table-thing with-label widget uib_w_60" data-uib="app_framework/input" data-ver="1">
+                                <label class="narrow-control label-top-left">EMAIL</label>
+                                <input class="wide-control" placeholder="Email" type="text">
+                            </div>
+                            <div class="table-thing with-label widget uib_w_61" data-uib="app_framework/input" data-ver="1">
+                                <label class="narrow-control label-top-left">TELEFONE</label>
+                                <input class="wide-control" placeholder="Telefone" type="text">
+                            </div>
+                            <a class="button btn-pink btn-padding">SALVAR</a>
+                            <span class="uib_shim"></span>
+                        </div>
+                    </div>
+                    <span class="uib_shim"></span>
+                </div>
+            </div>
+
+            <!-- Historico -->
+            <div id="historico" class="upage-content vertical-col left panel ac0" data-header="af-header-1" data-title="Historico">
+                <div class="grid grid-pad urow uib_row_10 row-height-10" data-uib="layout/row" data-ver="0">
+                    <div class="col uib_col_17 col-0_12-12" data-uib="layout/col" data-ver="0">
+                    <div class="vcenter-historico">Histórico Vazio.<br>Seus atendimentos serão listados aqui.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Meios de Pagamento -->
+            <div id="meios-pgto" class="upage-content vertical-col left panel ac0" data-header="af-header-1" data-title="Meios de Pagamento">
+                <div class="grid grid-pad urow uib_row_10 row-height-10" data-uib="layout/row" data-ver="0">
+                    <div class="col uib_col_17 col-0_12-12" data-uib="layout/col" data-ver="0">
+                    </div>
+                </div>
+            </div>            
+        </div>
+
+        <!-- menu lateral -->
+        <nav class="af-sidemenu outer-element uib_w_47" data-side="left" id="sidemenu" data-uib="app_framework/side_menu_area" data-ver="2">
+            <div class="view active">
+                <div class="pages">
+                    <div class="panel active">
+                        <div class="col uib_col_13 single-col" data-uib="layout/col" data-ver="0">
+                            <div class="widget-container content-area vertical-col">
+                                <div class="sidemenu-header">
+                                    <img src="images/no-user-image.png" id="userimg">
+                                    <div class="name">
+                                        <span id="username">fulano de Tal</span>
+                                        <br>
+                                        <span id="useremail">Email@site.com</span>
+                                    </div>
+                                    <span class="uib_shim"></span>
+                                </div>
+                                <ul class="list widget uib_w_48 d-margins" data-uib="app_framework/listview" data-ver="2">
+                                    <li class="widget uib_w_49" data-uib="app_framework/listitem" data-ver="2"><a id="btn-historico"><i class="fa fa-calendar"></i>&nbsp; Histórico</a>
+                                    </li>
+                                    <li class="widget uib_w_50" data-uib="app_framework/listitem" data-ver="2"><a id="btn-meios-pgto"><i class="fa fa-cc-visa"></i>&nbsp; Meios de Pagamento</a>
+                                    </li>
+                                    <li class="widget uib_w_51" data-uib="app_framework/listitem" data-ver="2"><a id="btn-elogiar"><i class="fa fa-heart"></i>&nbsp; Elogiar</a>
+                                    </li>
+                                    <li class="widget uib_w_52" data-uib="app_framework/listitem" data-ver="2"><a id="btn-compartilhar"><i class="fa fa-share-alt" ></i>&nbsp; Compartilhar</a>
+                                    </li>
+                                    <li class="widget uib_w_53" data-uib="app_framework/listitem" data-ver="2"><a class="btn-termos-uso"><i class="fa fa-file-text" ></i>&nbsp; Termos de Uso</a>
+                                    </li>
+                                    <li class="widget uib_w_53" data-uib="app_framework/listitem" data-ver="2"><a id="btn-sair"><i class="fa fa-sign-out"></i>&nbsp; Sair</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>            
+    </div>
+
+    
+    <!-- manicureview -->
+    <div class="upage view" id="manicureview"  data-footer="none">
+        <header id="af-header-2">
+            <div class="widget-container wrapping-col single-centered">
+                <div class="widget margin-header-logo" data-uib="media/img" data-ver="0" id="logo-header-manicure">
+                    <figure class="figure-align">
+                        <img src="images/logo-header.png">
+                        <figcaption data-position="bottom"></figcaption>
+                    </figure>
+                </div>
+            </div>
+            <a class="button el el-lines" data-transition="cover" data-left-menu="uib_w_47" id="btn-menu-manicure"></a>
+            <h1></h1>
+        </header>
+
+        <div class="pages">
+            <!-- manicure -->
+            <div class="upage-content vertical-col left panel ac0" id="manicure" data-title=" " data-header="af-header-2" data-footer="none">
+                <div class="grid grid-pad urow uib_row_2 row-height-2" data-uib="layout/row" data-ver="0">
+                    <div class="col uib_col_2 col-0_12-12" data-uib="layout/col" data-ver="0">
+                        <div class="urow vertical-col">
+                            <h2 style="text-align: center;">Você está Offline</h2>
+                            <a class="button d-margins btn-pink btn-padding pressed" data-uib="app_framework/button" data-ver="1" id="btn-registrou" data-page-type="document_page" data-transition="slide">FICAR ONLINE</a>
+                        </div>
+                        <ul class="list widget uib_w_48 d-margins" data-uib="app_framework/listview" data-ver="2">
+                            <li class="widget" data-uib="app_framework/listitem" data-ver="2"><a id="btn-manicure-calendar" ><i class="fa fa-calendar" ></i>&nbsp; Calendario de agendamentos</a>
+                            </li>
+                        </ul>
+
+                        <a href="#" id="btn-intent">MAPA</a>
+                        
+                </div>
+                </div>
+            </div>
+
+            <!-- manicure-calendar -->
+            <div class="upage-content vertical-col left panel ac0" id="manicure-calendar" data-title="Calendario" data-header="af-header-2" data-footer="none">
+                <div class="grid grid-pad urow uib_row_2 row-height-2" data-uib="layout/row" data-ver="0">
+                    <input id="calendar"/>
+                </div>
+            </div>
+
+            <!-- manicure-cronometro -->
+            <div class="upage-content vertical-col left panel ac0" id="manicure-cronometro" data-title="" data-header="none" data-footer="none">
+                <div class="grid grid-pad urow uib_row_2 row-height-2" data-uib="layout/row" data-ver="0">
+                    <div id="countdown"></div>
+                    <div>
+                        <center>
+                        <p>Rua sobe e desce n 123<br>
+                        Governador Valadares - MG</p>
+                        </center>
+                    </div>
+                    <div class="urow vertical-col">
+                    <a class="button d-margins btn-pink btn-padding pressed" data-uib="app_framework/button" 
+                    data-ver="1" id="btn-registrou" data-page-type="document_page" data-transition="slide">ACEITAR</a>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <div class="view" id="agendaView">
+        <header>
+            <h1 id="pageTitle">Escolha um horario</h1>            
+        </header>
+        <div class="pages">
+            <div class="panel" id="agenda-horarios">
+                <select>
+                    <option>9:00</option>
+                    <option>9:30</option>
+                    <option>10:00</option>
+                    <option>10:30</option>
+                    <option>11:00</option>
+                    <option>11:30</option>
+                    <option>12:00</option>
+                    <option>12:30</option>
+                    <option>13:00</option>
+                    <option>13:30</option>
+                    <option>14:00</option>
+                    <option>14:30</option>
+                    <option>15:00</option>
+                </select>
+                <ul class="list">
+                    <li>
+                        09:00
+                    </li>
+                    <li>
+                        09:30
+                    </li>
+                    <li>
+                        10:00
+                    </li>
+                    <li>
+                        10:30
+                    </li>
+                    <li>
+                        11:00
+                    </li>
+                    <li>
+                        11:30
+                    </li>
+                    <li>
+                        12:00
+                    </li>
+                    <li>
+                        12:30
+                    </li>
+                    <li>
+                        13:00
+                    </li>
+                    <li>
+                        13:30
+                    </li>
+                    <li>
+                        14:00
+                    </li>
+                    <li>
+                        14:30
+                    </li>
+                    <li>
+                        15:00
+                    </li>
+                    <li>
+                        15:30
+                    </li>
+                </ul>                
+            </div>            
+        </div>
+        <footer>
+            <a href="#" class="button btn-pink" data-transition="up-reveal:dismiss">Voltar</a>
+        </footer>
+        
+    </div>    
+    <script type="text/javascript">
+        if (!navigator.userAgent.toLowerCase().match('chrome')) {
+            document.write("<script src='cordova.js'><\/script>");
+        }        
+    </script>
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="lib/jquery/jquery.validate.min.js"></script>    
+    <script type="text/javascript" src="lib/localization/messages_pt_BR.js"></script>
+    <script type="text/javascript" src="lib/jquery.countdown360.js" charset="utf-8"></script>    
+    <script type="text/javascript" src="js/user.js"></script>
+    <script type="text/javascript" src="js/oauth.js"></script>
+    <script type="text/javascript" src="js/app.js"></script>
+    </body>
+</html>
