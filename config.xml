@@ -63,14 +63,14 @@
     </plugin>
 
     <plugin name="cordova-plugin-facebook4" spec="~1.7.1">
-        <variable name="APP_ID" value="537031369755381" />
-        <variable name="APP_NAME" value="nailnow" />
+        <param name="APP_ID" value="537031369755381" />
+        <param name="APP_NAME" value="nailnow" />
     </plugin>
     <plugin name="cordova-plugin-digits">
-        <variable name="FABRIC_API_KEY" value="a6edd807a9ceac315bb2097e2c1bd6667494503f" />
-        <variable name="FABRIC_CONSUMER_KEY" value="N7i5DK56Vi4Fc5kM5D2cVaexn" />
-        <variable name="FABRIC_CONSUMER_SECRET" value="9mup6ex8xJpYqz4CRryzHI2NVdlAOVdHR76SHyVKAWGYiAVt79" />
-        <variable name="PACKAGE_NAME" value="co.nailnow.app" />
+        <param name="FABRIC_API_KEY" value="a6edd807a9ceac315bb2097e2c1bd6667494503f" />
+        <param name="FABRIC_CONSUMER_KEY" value="N7i5DK56Vi4Fc5kM5D2cVaexn" />
+        <param name="FABRIC_CONSUMER_SECRET" value="9mup6ex8xJpYqz4CRryzHI2NVdlAOVdHR76SHyVKAWGYiAVt79" />
+        <param name="PACKAGE_NAME" value="co.nailnow.app" />
     </plugin>
 </widget>
 
