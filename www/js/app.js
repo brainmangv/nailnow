@@ -65,6 +65,17 @@
 
     function register_event_handlers(){        
         window.BOOTSTRAP_OK = true;
+        
+        document.addEventListener("backbutton", function(e){
+            if($.afui.activeDiv.id='main'){
+                e.preventDefault();
+                navigator.app.exitApp();
+            }
+            else {
+                navigator.app.backHistory()
+            }
+        }, false);
+
         if (window.cordova){
             switch (window.cordova.platformId){
                 case 'browser':
