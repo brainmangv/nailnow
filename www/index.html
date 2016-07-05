@@ -49,7 +49,7 @@
          $(document).ready(function(){
             setTimeout(function(){
                 $.afui.launch();
-            },100);
+            },300000);
         });
     </script>
     
@@ -83,15 +83,15 @@
     <audio id="beepSound" src="sound/beep.mp3" type="audio/mpeg" ></audio>
     <div id="fb-root"></div>
     
-    <div id="splashscreen" class='ui-loader'>
-        <figure class="figure-align">
-            <img src="icones/logo-home.png">
-            <figcaption data-position="bottom"></figcaption>
-        </figure>
-        <br><br>
-        <div class="ui-loader">
-            <span class='ui-icon ui-icon-loading spin'></span><h1 >Starting app</h1>
+    <div id="splashscreen" class='ui-loader panel'>
+        <div class="vcenter-logo-home">
+            <figure class="figure-align">
+                <img src="icones/logo-home.png">
+                <figcaption data-position="bottom"></figcaption>
+            </figure>
         </div>
+        <br><br>
+        <span class='ui-icon ui-icon-loading spin'></span><h1 >Iniciando aplicativo</h1>
     </div>
 
     <div class="view" id="mainview">
@@ -101,7 +101,7 @@
         </header>        
         <div class="pages">
             <!--main -->
-            <div id="main" class="upage-content vertical-col panel active" data-title=" " data-header="none" data-footer="none">
+            <div id="main" class="upage-content vertical-col panel" data-title=" " data-header="none" data-footer="none">
                 <div class="grid grid-pad urow uib_row_7 row-height-7" data-uib="layout/row" data-ver="0">
                     <div class="col uib_col_11 col-0_12-12" data-uib="layout/col" data-ver="0">
                         <div class="widget-container content-area vertical-col">
