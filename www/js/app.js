@@ -57,8 +57,8 @@
         }
     });
     document.addEventListener("app.Ready", register_event_handlers, false);
-    document.addEventListener("app.Ready", redirect_if_logged, false);
     document.addEventListener("app.Ready", initMap, false);
+    document.addEventListener("app.Ready", redirect_if_logged, false);    
     //document.addEventListener("app.Ready", wakelock, false);
     //document.addEventListener("app.Ready", geolocationAutoUpdate, false);
     document.addEventListener("app.Ready", setupPush, false);
