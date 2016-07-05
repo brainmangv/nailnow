@@ -38,7 +38,7 @@
     var addressLocation =null;
     var tipo_usuario='';
     var user = new User();
-    var $oauth = new Oauth('http://192.168.1.5');
+    var $oauth = new Oauth('https://api.nailnow.co');
     var USER_IMAGE_PATH= 'http://192.168.1.5/images/users/';
     var countdown =  $("#countdown").countdown360({
         radius      : ($(document).width()/2) - 60,
