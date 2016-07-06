@@ -901,6 +901,11 @@ body#afui .splt {
 .ios7 .view header .button,.ios7 .view header .backButton {
   color: black;
 }
+
+.ios7 .backButton::before {
+  top: -6px;
+}
+
 @media all and (min-width: 0px) {
   #afui .row-height-10 > .col > .content-area {
     min-height: 100px;
