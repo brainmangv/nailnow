@@ -64,7 +64,9 @@ Oauth.prototype ={
 		});
 	},
 
-    ajax2: function(url, type , data =null , withtoken = true){
+    ajax2: function(url, type , data , withtoken ){
+		data = typeof data !== 'undefined' ? data : null;
+		withtoken = typeof withtoken !== 'undefined' ? withtoken : true;
 		var that=this;
 		var ajaxobj ={
 			url: url,
@@ -99,7 +101,9 @@ Oauth.prototype ={
 		}
     },
 	
-	ajax: function(url, type , data =null , withtoken = true){
+	ajax: function(url, type , data , withtoken){
+    	data = typeof data !== 'undefined' ? data : null;
+		withtoken = typeof withtoken !== 'undefined' ? withtoken : true;
     	var that=this;
     	var d = $.Deferred();
     	var ajaxobj ={
@@ -133,7 +137,8 @@ Oauth.prototype ={
 	},
 
 
-	get: function (url, withtoken = true){				
+	get: function (url, withtoken ){				
+		withtoken = typeof withtoken !== 'undefined' ? withtoken : true;
 		$.afui.showMask('Processando...');
 		$.afui.blockUI(.2);
 		return this.ajax(url,'GET',null, withtoken)
@@ -144,7 +149,9 @@ Oauth.prototype ={
 		})
 	},
 
-	post: function (url, data = null, withtoken = true){		
+	post: function (url, data, withtoken){		
+		data = typeof data !== 'undefined' ? data : null;
+		withtoken = typeof withtoken !== 'undefined' ? withtoken : true;
 		$.afui.showMask('Processando...');
 		$.afui.blockUI(.2);
 		return this.ajax(url,'POST',data,withtoken)
@@ -155,7 +162,9 @@ Oauth.prototype ={
 		})
 	},
 
-	patch: function (url, data = null, withtoken = true){		
+	patch: function (url, data, withtoken){		
+		data = typeof data !== 'undefined' ? data : null;
+		withtoken = typeof withtoken !== 'undefined' ? withtoken : true;
 		$.afui.showMask('Processando...');
 		$.afui.blockUI(.2);
 		return this.ajax(url,'PATCH',data,withtoken)

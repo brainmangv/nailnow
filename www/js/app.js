@@ -85,8 +85,6 @@
                 case 'ios':
                     StatusBar.hide();
                     break;    
-                default:
-                    //openFB.init({appId: 537031369755381});
             }
         }
         if( navigator.splashscreen && navigator.splashscreen.hide ) {   // Cordova API detected
