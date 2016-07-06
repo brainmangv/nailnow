@@ -82,6 +82,9 @@
                 case 'browser':
                     facebookConnectPlugin.browserInit('537031369755381','v2.2');  
                     break;
+                case 'ios':
+                    StatusBar.hide();
+                    break;    
                 default:
                     //openFB.init({appId: 537031369755381});
             }
