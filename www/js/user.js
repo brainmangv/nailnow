@@ -219,9 +219,11 @@ function User() {
 			that.current = null;
 
 			// Facebook logout
-			//try{
+			try{
 				facebookConnectPlugin.logout(function(e){console.log('FB logout',e)});
-			//}catch(e){}
+			}catch(e){
+				console.log('erro no facefacebookConnectPlugin',e);
+			}
 		});
 	};
 
@@ -303,73 +305,75 @@ function User() {
 	this.loginFB= function (type){
 		var d = $.Deferred();
 		var that= this;
-		
-		facebookConnectPlugin.getLoginStatus(function(success) {
-			console.log('success.status ', success);
+		try{
+			facebookConnectPlugin.getLoginStatus(function(success) {
+				console.log('success.status ', success);
 
-			if(success.status === 'connected'){
-				// The user is logged in and has authenticated your app, and response.authResponse supplies
-				// the user's ID, a valid access token, a signed request, and the time the access token
-				// and signed request each expire
-				that.password=success.authResponse.accessToken;
-				// If we don't have our user saved
-				if(!$oauth.getToken()){
-					that.getFacebookProfileInfo(success.authResponse)
-					.then(function(userData) {
+				if(success.status === 'connected'){
+					// The user is logged in and has authenticated your app, and response.authResponse supplies
+					// the user's ID, a valid access token, a signed request, and the time the access token
+					// and signed request each expire
+					that.password=success.authResponse.accessToken;
+					// If we don't have our user saved
+					if(!$oauth.getToken()){
+						that.getFacebookProfileInfo(success.authResponse)
+						.then(function(userData) {
 
-						//Check user in the DB
-						that.checkFacebookUserDB(userData,type,that.password)
-						.then(function(response){
-							d.resolve(response);
-						})
-						.fail(function(response){
-							d.reject(response);
-						})
+							//Check user in the DB
+							that.checkFacebookUserDB(userData,type,that.password)
+							.then(function(response){
+								d.resolve(response);
+							})
+							.fail(function(response){
+								d.reject(response);
+							})
 
-					}, function(fail){
-						// Fail get profile info
-						console.log('Profile info fail', fail);
-						d.reject(fail);
-					});
-				}
-				else{
-					d.resolve();
-				}
-			}
-			else {
-				console.log('getLoginStatus2', success);
-				facebookConnectPlugin.login(['email', 'public_profile'], function(response){
-					console.log('fbLoginSuccess', response);
-
-					if (!response.authResponse){
-						console.log('fbLoginSuccess Error', response);
-						d.reject(response);
-					}
-					var authResponse = response.authResponse;
-					that.password=response.authResponse.accessToken;
-					that.getFacebookProfileInfo(authResponse)
-					.then(function(userData) {
-						//Check user in the DB
-						that.checkFacebookUserDB(userData, type, that.password)
-						.then(function(response){
-							d.resolve(response);
-						})
-						.fail(function(response){
-							d.reject(response);
+						}, function(fail){
+							// Fail get profile info
+							console.log('Profile info fail', fail);
+							d.reject(fail);
 						});
-					}, function(fail){
-						// Fail get profile info
-						console.log('profile info fail', fail);
-						d.reject(fail);
+					}
+					else{
+						d.resolve();
+					}
+				}
+				else {
+					console.log('getLoginStatus2', success);
+					facebookConnectPlugin.login(['email', 'public_profile'], function(response){
+						console.log('fbLoginSuccess', response);
+
+						if (!response.authResponse){
+							console.log('fbLoginSuccess Error', response);
+							d.reject(response);
+						}
+						var authResponse = response.authResponse;
+						that.password=response.authResponse.accessToken;
+						that.getFacebookProfileInfo(authResponse)
+						.then(function(userData) {
+							//Check user in the DB
+							that.checkFacebookUserDB(userData, type, that.password)
+							.then(function(response){
+								d.resolve(response);
+							})
+							.fail(function(response){
+								d.reject(response);
+							});
+						}, function(fail){
+							// Fail get profile info
+							console.log('profile info fail', fail);
+							d.reject(fail);
+						});
+
+					}, function(error){ // This is the fail callback from the login method
+						console.log('fbLoginError', error);
+						d.reject(error);
 					});
-
-				}, function(error){ // This is the fail callback from the login method
-					console.log('fbLoginError', error);
-					d.reject(error);
-				});
-			}
-		});
-
+				}
+			});
+		}catch(e){
+			console.log('>>>facebookConnectPlugin',e.message);			
+		}
 		return d.promise();
 	};
 

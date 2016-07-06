@@ -65,7 +65,7 @@
 
     function register_event_handlers(){        
         window.BOOTSTRAP_OK = true;
-        
+        console.log('appready');
         document.addEventListener("backbutton", function(e){
             console.log('backbutton');
             if($.afui.activeDiv.id=='main'){
@@ -663,51 +663,55 @@
 
     function setupPush() {
         console.log('calling push init');
-        var push = PushNotification.init({
-            "android": {
-                "senderID": "499027471276"
-            },
-            "ios": {
-                "sound": true,
-                "vibration": true,
-                "badge": true
-            },
-            "windows": {}
-        });
-        console.log('after init');
+        try{
+            var push = PushNotification.init({
+                "android": {
+                    "senderID": "499027471276"
+                },
+                "ios": {
+                    "sound": true,
+                    "vibration": true,
+                    "badge": true
+                },
+                "windows": {}
+            });
+            console.log('after init');
 
-        push.on('registration', function(data) {
-            console.log('registration event: ' + data.registrationId);
+            push.on('registration', function(data) {
+                console.log('registration event: ' + data.registrationId);
 
-            var oldRegId = localStorage.getItem('registrationId');
-            if (oldRegId !== data.registrationId) {
-                // Save new registration ID
-                localStorage.setItem('registrationId', data.registrationId);
-                // Post registrationId to your app server as the value has changed
-            }
+                var oldRegId = localStorage.getItem('registrationId');
+                if (oldRegId !== data.registrationId) {
+                    // Save new registration ID
+                    localStorage.setItem('registrationId', data.registrationId);
+                    // Post registrationId to your app server as the value has changed
+                }
 
-            //var parentElement = document.getElementById('registration');
-            //var listeningElement = parentElement.querySelector('.waiting');
-            //var receivedElement = parentElement.querySelector('.received');
+                //var parentElement = document.getElementById('registration');
+                //var listeningElement = parentElement.querySelector('.waiting');
+                //var receivedElement = parentElement.querySelector('.received');
 
-            //listeningElement.setAttribute('style', 'display:none;');
-            //receivedElement.setAttribute('style', 'display:block;');
-        });
+                //listeningElement.setAttribute('style', 'display:none;');
+                //receivedElement.setAttribute('style', 'display:block;');
+            });
 
-        push.on('error', function(e) {
-            console.log("push error = " + e.message);
-        });
+            push.on('error', function(e) {
+                console.log("push error = " + e.message);
+            });
 
-        push.on('notification', function(data) {
-            console.log('notification event',data);
-            navigator.notification.alert(
-                data.message,         // message
-                null,                 // callback
-                data.title,           // title
-                'Ok'                  // buttonName
-            );
-            navigator.notification.beep(1);
-       });
+            push.on('notification', function(data) {
+                console.log('notification event',data);
+                navigator.notification.alert(
+                    data.message,         // message
+                    null,                 // callback
+                    data.title,           // title
+                    'Ok'                  // buttonName
+                );
+                navigator.notification.beep(1);
+           });
+        }catch(e){
+            console.log(e.message);
+        }
     }
 
     function hide_map_panel(){
