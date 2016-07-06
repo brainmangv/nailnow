@@ -512,7 +512,7 @@
                     }
                 }]
               );*/
-            window.plugins.socialsharing.share('Ola Mundo');
+            window.plugins.socialsharing.share('Veja esse novo app para agendamentos de manicure.');
         });
 
         //btn-termos-uso
