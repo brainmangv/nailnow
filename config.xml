@@ -52,6 +52,7 @@
             <param name="ios-package" value="SocialSharing" />
         </feature>
     </platform>
+    <platform name="winphone" />
     <plugin source="git" spec="https://github.com/Initsogar/cordova-webintent.git" />
     <plugin name="cordova-plugin-keepe-cardio" source="npm" />
     <plugin name="cordova-plugin-app-version" source="npm" />
