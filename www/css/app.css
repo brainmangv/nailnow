@@ -17,7 +17,7 @@ body {
   margin: 0px;
 }
 .ios7 {
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family: 'Helvetica Neue LT', Arial, sans-serif;
 }
 /* grid */
 .grid {
@@ -308,7 +308,7 @@ body#afui .splt {
   }
 }
 @font-face {
-  font-family: "Helvetica Neue";
+  font-family: "Helvetica Neue LT";
   src: local('Helvetica Neue LT Std 45 Light'), url('HelveticaNeueLTStd Lt.woff') format('woff');
   font-style: normal;
   font-weight: normal;
@@ -715,7 +715,7 @@ body#afui .splt {
 .btn-padding {
   padding-top: 20px !important;
   padding-bottom: 20px !important;
-  font-height: normal !important;
+  font-weight: normal !important;
 }
 
 .btn-pink {
@@ -1189,4 +1189,9 @@ label.error{
 
 #lista-servicos .list-item input[type="number"]{
   text-align: center;
+}
+#appversion{
+  font-size: 12px;
+  text-align: center;
+}
 }

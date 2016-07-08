@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="co.nailnow.app" version="0.0.98" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="co.nailnow.app" version="0.1.00" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Nailnow</name>
     <description>
         Manicure a qualquer hora.
@@ -18,47 +18,44 @@
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
     <allow-intent href="google.streetview:*" />
-    <allow-intent href="google.navigation:*" />    
+    <allow-intent href="google.navigation:*" />
     <allow-intent href="cdvfile://*" />
     <preference name="android-minSdkVersion" value="15" />
     <preference name="android-targetSdkVersion" value="21" />
-    <preference name="android-installLocation" value="auto" />    
+    <preference name="android-installLocation" value="auto" />
     <preference name="orientation" value="portrait" />
     <preference name="android-build-tool" value="gradle" />
     <preference name="SplashScreenDelay" value="10000" />
-    <icon src="icon.png"/>
+    <icon src="icon.png" />
     <platform name="android">
         <allow-intent href="market:*" />
-        <icon  src="images/36x36.png" density="ldpi" width="36" height="36"/>
-        <icon  src="images/48x48.png" density="mdpi" width="48" height="48"/>
-        <icon  src="images/72x72.png" density="hdpi" width="72" height="72"/>
-        <icon  src="images/96x96.png" density="xhdpi" width="96" height="96"/>
-        <splash src="images/320x426.png" density="ldpi" width="320" height="426" orientation="portrait"/>
-        <splash src="images/320x470.png" density="mdpi" width="320" height="470" orientation="portrait"/>
-        <splash src="images/480x640.png" density="hdpi" width="480" height="640" orientation="portrait"/>
-        <splash src="images/720x960.png" density="xhdpi" width="720" height="960" orientation="portrait"/>
+        <icon density="ldpi" height="36" src="images/36x36.png" width="36" />
+        <icon density="mdpi" height="48" src="www/images/48x48.png" width="48" />
+        <icon density="hdpi" height="72" src="ages/72x72.png" width="72" />
+        <icon density="xhdpi" height="96" src="www/images/96x96.png" width="96" />
+        <splash density="ldpi" height="426" orientation="portrait" src="www/images/320x426.png" width="320" />
+        <splash density="mdpi" height="470" orientation="portrait" src="www/images/320x470.png" width="320" />
+        <splash density="hdpi" height="640" orientation="portrait" src="www/images/480x640.png" width="480" />
+        <splash density="xhdpi" height="960" orientation="portrait" src="www/images/720x960.png" width="720" />
         <feature name="SocialSharing">
             <param name="android-package" value="nl.xservices.plugins.SocialSharing" />
         </feature>
     </platform>
-    
     <platform name="ios">
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
         <preference name="deployment-target" value="7.0" />
         <splash src="images/320x480.png" />
-        <icon src="images/icon-60@3x.png" width="180" height="180" />
-        <icon src="images/icon-60@2x.png" width="120" height="120" />        
+        <icon height="180" src="images/icon-60@3x.png" width="180" />
+        <icon height="120" src="images/icon-60@2x.png" width="120" />
         <feature name="SocialSharing">
-          <param name="ios-package" value="SocialSharing" />
+            <param name="ios-package" value="SocialSharing" />
         </feature>
     </platform>
-   
-    <plugin spec="https://github.com/Initsogar/cordova-webintent.git" source="git" />
+    <plugin source="git" spec="https://github.com/Initsogar/cordova-webintent.git" />
     <plugin name="cordova-plugin-keepe-cardio" source="npm" />
     <plugin name="cordova-plugin-app-version" source="npm" />
     <plugin name="cordova-plugin-background-mode" />
-    <plugin name="cordova-plugin-compat" source="npm" />
     <plugin name="cordova-plugin-device" source="npm" />
     <plugin name="cordova-plugin-dialogs" source="npm" />
     <plugin name="cordova-plugin-geolocation" source="npm" />
@@ -66,25 +63,15 @@
     <plugin name="cordova-plugin-request-location-accuracy" source="npm" />
     <plugin name="cordova-plugin-splashscreen" source="npm" />
     <plugin name="cordova-plugin-statusbar" source="npm" />
-    <plugin name="cordova-plugin-vibration" source="npm" />    
-    <plugin spec="https://github.com/Viras-/cordova-plugin-powermanagement.git" source="git" />
+    <plugin name="cordova-plugin-vibration" source="npm" />
+    <plugin source="git" spec="https://github.com/Viras-/cordova-plugin-powermanagement.git" />
     <plugin name="cordova-plugin-x-socialsharing" source="npm" />
 
-    <plugin name="phonegap-plugin-push" source="npm" >    
-        <param name="SENDER_ID" value="499027471276"/>
+    <plugin name="phonegap-plugin-push" source="npm">
+        <param name="SENDER_ID" value="499027471276" />
     </plugin>
-
-    <plugin name="cordova-plugin-facebook4" spec="~1.7.1" source="npm">
-        <param name="APP_ID" value="537031369755381" />
-        <param name="APP_NAME" value="nailnow" />
+    <plugin name="cordova-plugin-facebook4" spec="~1.7.1">
+        <variable name="APP_ID" value="537031369755381" />
+        <variable name="APP_NAME" value="nailnow" />
     </plugin>
-    <!--
-    <plugin name="cordova-plugin-digits">
-        <param name="FABRIC_API_KEY" value="a6edd807a9ceac315bb2097e2c1bd6667494503f" />
-        <param name="FABRIC_CONSUMER_KEY" value="N7i5DK56Vi4Fc5kM5D2cVaexn" />
-        <param name="FABRIC_CONSUMER_SECRET" value="9mup6ex8xJpYqz4CRryzHI2NVdlAOVdHR76SHyVKAWGYiAVt79" />
-        <param name="PACKAGE_NAME" value="co.nailnow.app" />
-    </plugin>
--->
 </widget>
-

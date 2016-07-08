@@ -66,6 +66,12 @@
     function register_event_handlers(){        
         window.BOOTSTRAP_OK = true;
         console.log('appready');
+        cordova.getAppVersion().done(
+            function(v){
+                $("#appversion").html('appVersion:'+v);
+            }
+        );
+        
         document.addEventListener("backbutton", function(e){
             console.log('backbutton');
             if($.afui.activeDiv.id=='main'){
@@ -80,7 +86,7 @@
         if (window.cordova){
             switch (window.cordova.platformId){
                 case 'browser':
-                    facebookConnectPlugin.browserInit('537031369755381','v2.2');  
+                    facebookConnectPlugin.browserInit('537031369755381','v2.6');  
                     break;
                 case 'ios':
                     StatusBar.hide();
@@ -854,6 +860,7 @@
     function initMap() {
         geocoder= new google.maps.Geocoder();
         myLatLng = new google.maps.LatLng(-18.9064, -41.9666);
+        $
         map = new google.maps.Map(document.getElementById('map-canvas'), {
             zoom: 3,
             center: myLatLng,
