@@ -22,7 +22,7 @@
     <allow-intent href="google.navigation:*" />
     <allow-intent href="cdvfile://*" />
     
-    <preference name="phonegap-version" value="3.7.0" />
+    <preference name="phonegap-version" value="cli-6.1.0" />
     <preference name="android-minSdkVersion" value="15" />
     <preference name="android-targetSdkVersion" value="21" />
     <preference name="android-installLocation" value="auto" />
