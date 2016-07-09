@@ -22,7 +22,7 @@
     <allow-intent href="google.navigation:*" />
     <allow-intent href="cdvfile://*" />
     
-    <preference name="phonegap-version" value="3.0.0" />
+    <preference name="phonegap-version" value="3.7.0" />
     <preference name="android-minSdkVersion" value="15" />
     <preference name="android-targetSdkVersion" value="21" />
     <preference name="android-installLocation" value="auto" />
@@ -48,7 +48,7 @@
     <platform name="ios">
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
-        <!--preference name="deployment-target" value="7.0" / -->
+        <preference name="deployment-target" value="4.0" />
         <splash src="images/320x480.png" />
         <icon height="180" src="images/icon-60@3x.png" width="180" />
         <icon height="120" src="images/icon-60@2x.png" width="120" />
