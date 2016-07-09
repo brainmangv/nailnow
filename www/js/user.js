@@ -102,7 +102,7 @@ function User() {
 			}
 			that.current.imagem=imagemSrc;
 			window.localStorage.setItem("currentUser",JSON.stringify(that.current));
-			//console.log('currentuser',that.current);
+			console.log('currentuser',that.current);
 			
 			var appVersion;
 			if (typeof cordova !== 'undefined'){
@@ -138,7 +138,7 @@ function User() {
 						app_version: appVersion
 					}
 
-					//console.log('deviceInformation', JSON.stringify(deviceInformation));
+					console.log('deviceInformation', JSON.stringify(deviceInformation));
 
 					$oauth.updateUser(that.current.id, deviceInformation)
 					.then(function(response) {
@@ -147,7 +147,7 @@ function User() {
 
 					})
 					.fail(function(response) {
-						//console.log(JSON.stringify(response));
+						console.log(JSON.stringify(response));
 
 						d.resolve();
 					});
