@@ -52,6 +52,7 @@ body {
 .urow {
   clear: both;
   position: relative;
+  overflow: hidden;
 }
 form.urow {
   margin-bottom: 0px;
@@ -818,6 +819,9 @@ body#afui .splt {
   font-weight: bold;
   background: white;
 }
+.ios7 .button:disabled {
+    opacity: 0.6;
+}
 .ios7 .afPopup a:not(:first-of-type) {
   border-left: 1px solid #9e9e9e;
 }
@@ -1159,10 +1163,12 @@ label.error{
 }
 
 .cartao-credito {
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 10px;
+  padding: 10px 0px;
   margin-bottom: 10px;
+  border: none;
+  border-radius: 0;
+  border-bottom: 1px solid #ccc;
+
 }
 
 .cartao-credito img{
@@ -1170,8 +1176,23 @@ label.error{
 }
 
 .cartao-credito p{
-  margin-left: 41px;
-  margin-top: 1px;
+  padding-top: 1px;
+  padding-left: 42px;
+}
+.cartao-credito p.visa{
+  background: url('../images/visa.png')no-repeat;
+}
+
+.cartao-credito p.mastercard{
+  background: url('../images/mastercard.png')no-repeat;
+}
+
+.cartao-credito p.diners_clube{
+  background: url('../images/diners_clube.png')no-repeat;
+}
+
+.cartao-credito p.elo{
+  background: url('../images/elo.png')no-repeat;
 }
 
 #lista-servicos{
@@ -1194,4 +1215,83 @@ label.error{
   font-size: 12px;
   text-align: center;
 }
+select,
+textarea,
+input[type="text"],
+input[type=search],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+input[type="tel"],
+input[type="color"],
+.input-group  {
+  background: inherit;
+  color: inherit;
+  border: none;
+  border-radius: 0;
+  border-bottom: 1px solid #ccc;
+}
+.star-ratings-sprite {
+  background: url("../images/star-rating-sprite.png") repeat-x;
+  font-size: 0;
+  height: 21px;
+  line-height: 0;
+  overflow: hidden;
+  text-indent: -999em;
+  width: 110px;
+  margin: 0 auto;
+}
+.star-ratings-sprite-rating {
+  background: url("../images/star-rating-sprite.png") repeat-x;
+  background-position: 0 100%;
+  float: left;
+  height: 21px;
+  display:block;
+}
+#lista-manicures li a{
+  overflow: hidden;
+}
+#lista-manicures li img{
+  float: left;
+  width: auto;
+  height: 44px;
+}
+#lista-manicures li .nome{
+  float: left;
+  margin-left: 10px;
+  margin-top: 12px;
+}
+#lista-manicures li .star-ratings{
+  float: right; 
+  margin-top: 9px;
+}
+#lista-manicures li .star-ratings p{
+  margin: 0px 5px;
+  font-size: 11px;
+}
+#confirmacao-resumo li.total{
+  background-color: #f3f3f3;
+  margin-left: 0px;
+  padding-left: 20px;
+  margin-bottom: 0px;
+  font-weight: bold;
+  padding-bottom: 30px;
+}
+#confirmacao-resumo h1 {
+    font-size: 15px;
+    text-align: center;
+    padding: 10px 10px;
+    background: #f3f3f3;
+}
+@media all and (max-width: 320px) {
+   .ios7 ul.list {
+      font-size:11px;
+    }
 }

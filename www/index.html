@@ -38,7 +38,7 @@
     <script src="xdk/init-dev.js"></script>     <!-- normalizes device and document ready events, see README for details -->
     <script type="application/javascript" src="lib/jquery/jquery-1.10.2.min.js"></script>
     <script src="lib/jquery/ui/jquery-ui-1.11.4.custom.min.js"></script>    
-    <script src="lib/jquery/jquery.ui.touch-punch.min.js"></script>     
+    <script src="lib/jquery/jquery.ui.touch-punch.min.js"></script>
     <script type="application/javascript" src="app_framework/3.0/appframework.ui.js"></script>
     <script type="text/javascript" src="app_framework/pageChangeRepeater.js"></script>
     <script type="text/javascript" src="js/find-prototype.js"></script>    
@@ -82,15 +82,30 @@
 <body  id="afui" class="v2 ios7">
     <audio id="beepSound" src="sound/beep.mp3" type="audio/mpeg" ></audio>
     <div id="fb-root"></div>  
-        
+    
+    <div class="view">
+        <div class="pages">
+            <div id="splash" class="upage-content vertical-col panel active"  data-title=" " data-header="none" data-footer="none">
+                <div class="grid urow uib_row_7" data-uib="layout/row" data-ver="0">
+                    <div class="col uib_col_11 col-0_12-12" data-uib="layout/col" data-ver="0">
+                        <figure class="figure-align">
+                            <img src="images/720x960.png">
+                            <figcaption id="" data-position="bottom"></figcaption>
+                        </figure>
+                    </div>
+                </div>
+            </div>
+        </div>        
+    </div>    
+
     <div class="view" id="mainview">
         <header id="af-header-0">
-            <a href="javascript:;" class="button backButton" style="visibility: hidden; ">Voltar</a>
+            <a href="javascript:;" class="button backButton" style="visibility: hidden; "></a>
             <h1 id="pageTitle"></h1>
         </header>        
         <div class="pages">
             <!--main -->
-            <div id="main" class="upage-content vertical-col panel active" data-title=" " data-header="none" data-footer="none">
+            <div id="main" class="upage-content vertical-col panel" data-title=" " data-header="none" data-footer="none">
                 <div class="grid grid-pad urow uib_row_7 row-height-7" data-uib="layout/row" data-ver="0">
                     <div class="col uib_col_11 col-0_12-12" data-uib="layout/col" data-ver="0">
                         <div class="widget-container content-area vertical-col">
@@ -126,7 +141,7 @@
             <div id="login" class="upage-content vertical-col hidden panel" data-title="Login" data-header="af-header-0" data-footer="login-footer">
                 <div class="grid grid-pad urow uib_row_2 row-height-2" data-uib="layout/row" data-ver="0">
                     <div class="col uib_col_2 col-0_12-12" data-uib="layout/col" data-ver="0">
-                        <form id="frm_login" action="#">
+                        <form id="frm-login" action="#">
                             <div class="widget-container content-area vertical-col">
 
                                 <p class="d-margins widget center background-line" data-ver="0">
@@ -146,7 +161,7 @@
                                 <div class="table-thing with-label widget uib_w_9" data-uib="app_framework/input" data-ver="1">
                                     <label class="narrow-control label-top-left">SENHA</label>
 
-                                    <input class="wide-control" placeholder="senha" type="text" name="login_senha" id="login_senha">
+                                    <input class="wide-control" placeholder="senha" type="password" name="login_senha" id="login_senha">
                                 </div>
                                 <a class="button d-margins btn-pink btn-padding" id="btn-login2">LOGIN</a>
                                 <span class="uib_shim"></span>
@@ -176,7 +191,7 @@
             r="af-header-0" data-footer="none">
                 <div class="grid grid-pad urow uib_row_3 row-height-3" data-uib="layout/row" data-ver="0">
                     <div class="col uib_col_3 col-0_12-12" data-uib="layout/col" data-ver="0">
-                        <form id="frm_registrar" action="#">
+                        <form id="frm-registrar" action="#">
                         <div class="widget-container content-area vertical-col">
 
                             <a class="button d-margins btn-facebook btn-padding" id="btn-facebook-registrar">CADASTRAR COM O FACEBOOK</a>
@@ -273,73 +288,48 @@
             <div class="upage-content panel vertical-col confirmacao" data-title="Confirmação" data-header="af-header-1" id="confirmacao-agendamento">
                 <div id="pin2" class="map-pin"></div>
                 <img id="static-map-agendamento"></img>
+                <form id="frm-confirmacao-agendamento">
                 <div class="grid grid-pad urow vertical-col">
                         <h1><i class="fa fa-map-marker fa-1x" aria-hidden="true"></i>Endereço de atendimento</h1>
-                        <div class="col col2-3">
-                            <input class="wide-control" placeholder="Endereço" type="text" id="conf_endereco">
+                        
+                        <div class="col col3-4">
+                            <input class="wide-control" placeholder="Endereço" type="text" id="conf_endereco" v-model="conf_endereco" v-on="blur:showAlert" required>
                         </div>
-                        <div class="col last col1-3">
-                            <input class="wide-control" placeholder="Numero" type="number" id="conf_numero">
+                        <div class="col last col1-4 last">
+                            <input class="wide-control" placeholder="Numero" type="number" id="conf_numero" required>
                         </div>
-                        <!--
-                        <div class="col col2-3">
-                            <input class="wide-control" placeholder="Cidade" type="text" id="conf_cidade">
+                                                
+                        <div class="col col2-4">
+                            <input class="wide-control" placeholder="Complemento" type="text" id="conf_complemento">
                         </div>
-                        <div class="col last col1-3">
-                            <input class="wide-control" placeholder="Bairro" type="text" id="conf_bairro">
+                        <div class="col col2-4 last">
+                        <input class="wide-control" placeholder="Bairro" type="text" id="conf_bairro" required>
                         </div>
-                        <input class="wide-control" placeholder="Ponto de referencia" type="text" id="conf_p_referencia">
-                        <span class="uib_shim"></span>
-                        -->
-                        <h1><i class="fa fa-credit-card fa-1x" aria-hidden="true"></i>Pagamento</h1>
+
+                        <div class="col col2-4">
+                        <input class="wide-control" placeholder="Cidade" type="text" id="conf_cidade" required>
+                        </div>
+
+                        <div class="col col2-4 last">
+                        <input class="wide-control" placeholder="UF" type="text" id="conf_uf" maxlength=2>
+                        </div>
+
+                        <div class="col col2-4">
+                        <input class="wide-control" placeholder="CEP" data-mask="00000-000" type="text" id="conf_cep" required>
+                        </div>
+
+                        <div class="col col2-4 last">
+                        <input class="wide-control" placeholder="Telefone de Contato" data-mask="(00) 00000-0000" type="text" id="conf_telefone">
+                        </div>
+                        
+                        <h1><i class="fa fa-credit-card fa-1x" aria-hidden="true"></i>Forma de Pagamento</h1>
                         <div class="cartao-credito">
-                            <img src="images/visa.png"><p>CARTÃO FINAL ... 456</p>    
+                            <p class="visa">Adicione um Cartão de Credito</p>    
                         </div>
-                        <!--input class="wide-control" placeholder="Numero do Cartão" type="text" id="conf_pgto" readonly="true">
-                         <!-- 
-                        <h1><i class="fa fa-calendar fa-1x" aria-hidden="true"></i>Data</h1>
-                        <input class="wide-control" placeholder="Data" type="text" id="conf_data">
-
-                        <h1><i class="fa fa-clock-o fa-1x" aria-hidden="true"></i>Horario</h1>
-                        <select id="conf_hora">
-                            <option>Selecione</option>
-                            <option>9:00</option>
-                            <option>9:30</option>
-                            <option>10:00</option>
-                            <option>10:30</option>
-                            <option>11:00</option>
-                            <option>11:30</option>
-                            <option>12:00</option>
-                            <option>12:30</option>
-                            <option>13:00</option>
-                            <option>13:30</option>
-                            <option>14:00</option>
-                            <option>14:30</option>
-                            <option>15:00</option>
-                        </select>
-
-                        <h1><i class="fa fa-clock-o fa-1x" aria-hidden="true"></i>Serviço</h1>
-                        <select id="conf_servicos" multiple>
-                            <option>Selecione</option>
-                            <option>9:00</option>
-                            <option>9:30</option>
-                            <option>10:00</option>
-                            <option>10:30</option>
-                            <option>11:00</option>
-                            <option>11:30</option>
-                            <option>12:00</option>
-                            <option>12:30</option>
-                            <option>13:00</option>
-                            <option>13:30</option>
-                            <option>14:00</option>
-                            <option>14:30</option>
-                            <option>15:00</option>
-                        </select>
-                        -->
-                        <!--input class="wide-control" placeholder="Horario" type="text" id="conf_hora" -->
                 </div>
+                </form>
                 <div class="grid grid-pad urow vertical-col btn-row-align-bottom">
-                    <a href="#confirmacao-servico" data-transition="slide" class="button btn-pink">CONTINUAR</a>
+                    <button id="btn-confirmacao-agendamento" data-transition="slide" class="button btn-pink" disabled>CONTINUAR</button>
                 </div>
                 <span class="uib_shim"></span>               
             </div>
@@ -350,7 +340,7 @@
                 <img id="static-map-confirmacao"></img>
                 <div class="grid grid-pad urow vertical-col">                        
                     <div id="map-footer-pedido">
-                        <p>CARTÃO VISA ...456</p>
+                        <p>**** **** **** 456</p>
                         <P>Serviços</P>
                         <input type="" name="">
                         <a href="button btn-black">PEDIR AGORA</a>    
@@ -394,7 +384,7 @@
                             <option>14:30</option>
                             <option>15:00</option>
                         </select>
-                        <!--input class="wide-control" placeholder="Horario" type="text" id="conf_hora" -->
+                        <input class="wide-control" placeholder="Horario" type="text" id="conf_hora">
                         <a class="button btn-pink disabled" id="btn-pedido-agora">CONTINUAR</a>
                         <span class="uib_shim"></span>
                 </div>
@@ -402,39 +392,118 @@
             </div>
             
             <!-- confirmação selecione serviço-->
-            <div class="upage-content panel vertical-col confirmacao" data-title="Serviços" data-header="af-header-1" id="confirmacao-servico">                        
+            <div class="upage-content panel vertical-col confirmacao" data-title="Serviços" id="confirmacao-servicos">
                 <div class="grid grid-pad urow list-item" class="list-item" style="text-align: center;">
-                    <p>Selecione os Servicos e a quantidade de atendimentos.</p>
+                    <p>Selecione os servicos e a quantidade de pessoas a serem atendidas.</p>
                 </div>                
                 <div id="lista-servicos"></div>                
 
                 <div class="grid grid-pad urow vertical-col btn-row-align-bottom">
-                    <a class="button btn-pink" id="btn-sel-servico">CONTINUAR</a>
+                    <button class="button btn-pink" id="btn-confirmacao-servicos" disabled>CONTINUAR</button>
                 </div>
                 <span class="uib_shim"></span>               
             </div>
-            <!-- Adicionar Cartão-->
-            <div class="upage-content panel vertical-col" data-title="Adicionar pagamento" data-header="af-header-1" id="add_cartao">
-            <div class="grid grid-pad urow vertical-col">
-                <div class="col col2-3">
-                    <input class="wide-control" type="number" id="num_cartao" placeholder="Numero do cartão de crédito">
-                </div>
-                <div class="col last col1-3">
-                    <a class="button icon camera btn-pink" id="btn_digitalizar"></a>
-                </div>
-                <div class="col col1-3">
-                    <input type="number" id="carta_mes" placeholder="MM">
-                </div>
-                <div class="col last col1-3">
-                    <input type="number" id="carta_ano" placeholder="AA">
-                </div>
-                <div class="col last col1-3">
-                    <input type="number" id="carta_cvv" placeholder="CVV">
-                </div>
-                <a class="button btn-pink btn-padding">Adicionar Pagamento</a>               
-                </div>
+
+            <!-- confirmação selecione manicures-->
+            <div class="upage-content panel vertical-col confirmacao" data-title="Manicures" id="confirmacao-manicures">
+                <div class="grid grid-pad urow list-item" class="list-item" style="text-align: center;">
+                    <p>Selecione um profissional.</p>
+                </div>                
+                <ul id="lista-manicures" class="list"></ul>             
+                <span class="uib_shim"></span>               
             </div>            
 
+            <!-- confirmação selecione data e hora-->
+            <div class="upage-content panel vertical-col confirmacao" data-title="Data e Hora" id="confirmacao-data-hora">
+                <div class="grid grid-pad urow list-item" class="list-item" style="text-align: center;">
+                    <p>Selecione a Data e Horário para o atendimento.</p>
+                </div>                
+                <ul id="data-hora" class="list">                    
+                    <li><a id="btn-data"><i class="fa fa-calendar" aria-hidden="true"></i>&nbsp; Data</a></li>
+                    <li><a id="btn-hora"><i class="fa fa-clock-o" aria-hidden="true"></i>&nbsp; Hora</a></li>                    
+                </ul>
+
+                <div class="grid grid-pad urow vertical-col btn-row-align-bottom">
+                    <button class="button btn-pink" id="btn-confirmacao-data-hora" disabled>CONTINUAR</button>
+                </div>             
+                <span class="uib_shim"></span>               
+            </div>
+
+            <!-- confirmação selecione data-->
+            <div class="panel vertical-col"  data-header="af-header-data" data-title="Escolha uma Data" id="selecionar-data">               
+                <ul class="list"></ul>                
+            </div>
+
+            <!-- confirmação selecione hora-->
+            <div class="panel vertical-col"  data-title="Escolha um Horário" id="selecionar-hora">               
+                <ul class="list"></ul>                
+            </div>
+
+            <!-- confirmação resumo-->
+            <div class="panel" data-title="Resumo" id="confirmacao-resumo">
+                <h1>Resumo do Pedido</h1>
+                <ul class="list">                    
+                    <li>
+                        <i class="fa fa-map-marker fa-fw fa-2x" aria-hidden="true"></i><span id="resumo-endereco"></span>
+                    </li>
+                    <li class="grid urow">
+                        <div class="col col2-4">
+                            <i class="fa fa-calendar fa-fw fa-2x" aria-hidden="true"></i><span id="resumo-data"></span>
+                        </div>
+                        <div class="col col2-4">
+                            <i class="fa fa-clock-o fa-fw fa-2x" aria-hidden="true"></i><span id="resumo-hora"></span>
+                        </div>                
+                    </li>
+                    <li class=""><i class="fa fa-credit-card fa-fw fa-2x" aria-hidden="true"></i><span id="resumo-cartao"></span></li>
+                </ul>
+                <h1><i class="fa fa-briefcase fa-fw fa-1x" aria-hidden="true"></i>Serviços solicitados</h1>
+                <ul class="list inset" id="resumo-servicos">
+                    <li class="urow">	
+                        <div class="col col3-4">Pedicure Comun x2</div>
+                        <div class="col col1-4 last">R$ 100,00</div>
+                    </li>                
+                    <li class="urow">
+                        <div class="col col3-4">Unhas de Gel - Manutenção x1</div>
+                        <div class="col col1-4 last">R$ 40,00</div>
+                    </li>
+
+                    <li class="urow total">
+                        <div class="col col3-4">Total</div>
+                        <div class="col col1-4 last"><span id="resumo-total">R$ 140,00</span></div>
+                    </li>  
+                </ul>
+                <div class="grid grid-pad vertical-col urow" style="font-size: 13px;">
+                    <button class="button btn-pink" id="btn-confirmacao-resumo">Confirmar Pedido </button>
+                </div>
+            </div>
+            
+            <!-- Adicionar Cartão-->
+            <div class="upage-content panel vertical-col" data-title="Adicionar Cartão" data-header="af-header-1" id="add-cartao">
+                <form id="frm-add-cartao" action="#">
+                    <div class="grid grid-pad urow vertical-col">
+                        <div class="col">
+                            <input class="wide-control" type="text" id="holder_name" name="holder_name" placeholder="Nome do titular como esta no cartão">
+                        </div>
+
+                        <div class="col col3-4">
+                            <input class="wide-control" type="number" id="card_number" name="card_number" placeholder="Numero do cartão de crédito">
+                        </div>
+                        <div class="col last col1-4">
+                            <a class="button icon camera btn-pink" id="btn_digitalizar"></a>
+                        </div>
+                        <div class="col col2-3">
+                            <input type="text" id="card_expiration" name="card_expiration" data-mas="99/9999" placeholder="MM/AAAA">
+                        </div>
+                        
+                        <div class="col last col1-3">
+                            <input type="text" id="card_cvv" name="card_cvv" placeholder="cvv">
+                        </div>
+                        <a class="button btn-pink" id="btn-add-cartao">Novo Cartão</a>               
+                        <p> Para validar seu cartão será feito uma operação de débito no valor de R$ 0,01 no seu cartão. Após a validação esse valor será estornado.</p>
+                    </div>
+                </form>
+            </div>            
+            
             <!-- Editar Conta -->
             <div class="upage-content vertical-col left panel ac0" id="editar_conta" data-header="af-header-1" data-title="Editar Conta">
                 <div class="grid grid-pad urow uib_row_10 row-height-10" data-uib="layout/row" data-ver="0">
@@ -472,14 +541,16 @@
             <!-- Meios de Pagamento -->
             <div id="meios-pgto" class="upage-content vertical-col left panel ac0" data-header="af-header-1" data-title="Meios de Pagamento">
                 <div class="grid grid-pad urow uib_row_10 row-height-10" data-uib="layout/row" data-ver="0">
-                    <div class="col uib_col_17 col-0_12-12" data-uib="layout/col" data-ver="0">
+                    <div class="col col-0_12-12 vertical-col" data-uib="layout/col" data-ver="0">
+                        <div class="cartao-credito"><p class=""> Sem nenhum cartao cadastrado</p></div>
+                        <button id="btn-meios-pgto-add" class="button btn-black">Adicionar Cartão</button>
                     </div>
                 </div>
             </div>            
         </div>
 
         <!-- menu lateral -->
-        <nav class="af-sidemenu outer-element uib_w_47" data-side="left" id="sidemenu" data-uib="app_framework/side_menu_area" data-ver="2">
+        <nav class="af-sidemenu outer-element uib_w_47 swipe-reveal" data-side="left" id="sidemenu" data-uib="app_framework/side_menu_area" data-ver="2">
             <div class="view active">
                 <div class="pages">
                     <div class="panel active">
@@ -585,49 +656,35 @@
             <h1 id="pageTitle">Escolha um horario</h1>            
         </header>
         <div class="pages">
-            <div class="panel" id="agenda-horarios">
-                <select>
-                    <option>9:00</option>
-                    <option>9:30</option>
-                    <option>10:00</option>
-                    <option>10:30</option>
-                    <option>11:00</option>
-                    <option>11:30</option>
-                    <option>12:00</option>
-                    <option>12:30</option>
-                    <option>13:00</option>
-                    <option>13:30</option>
-                    <option>14:00</option>
-                    <option>14:30</option>
-                    <option>15:00</option>
-                </select>
+            <!-- confirmação selecione hora-->
+            <div class="panel vertical-col"  data-title="Escolha um Horário" id="view-hora">               
                 <ul class="list">
                     <li>
-                        09:00
+                        <a data-hora="09:00">09:00</a>
                     </li>
                     <li>
-                        09:30
+                        <a data-hora="09:30">09:30</a>
                     </li>
                     <li>
-                        10:00
+                        <a data-hora="10:00">10:00</a>
                     </li>
                     <li>
-                        10:30
+                        <a data-hora="10:30">10:30</a>
                     </li>
                     <li>
-                        11:00
+                        <a data-hora="10:30">11:00</a>
                     </li>
                     <li>
-                        11:30
+                        <a data-hora="10:30">11:30</a>
                     </li>
                     <li>
-                        12:00
+                        <a data-hora="10:30">12:00</a>
                     </li>
                     <li>
-                        12:30
+                        <a data-hora="10:30">12:30</a>
                     </li>
                     <li>
-                        13:00
+                        <a data-hora="10:30">13:00</a>
                     </li>
                     <li>
                         13:30
@@ -645,19 +702,17 @@
                         15:30
                     </li>
                 </ul>                
-            </div>            
-        </div>
-        <footer>
-            <a href="#" class="button btn-pink" data-transition="up-reveal:dismiss">Voltar</a>
-        </footer>
-        
-    </div>        
+            </div>                      
+        </div>        
+    </div>
     <script type="text/javascript" src="cordova.js"></script>
     <script type="text/javascript" src="lib/jquery/jquery.validate.min.js"></script>    
+    <script type="text/javascript" src="lib/jquery/jquery.mask.min.js"></script>    
     <script type="text/javascript" src="lib/localization/messages_pt_BR.js"></script>
-    <script type="text/javascript" src="lib/jquery.countdown360.js" charset="utf-8"></script>    
+    <script type="text/javascript" src="lib/jquery/jquery.countdown360.js" charset="utf-8"></script>    
     <script type="text/javascript" src="js/user.js"></script>
     <script type="text/javascript" src="js/oauth.js"></script>
-    <script type="text/javascript" src="js/app.js"></script>    
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/vue/0.12.16/vue.min.js"></script>
+    <script type="text/javascript" src="js/app.js"></script>
     </body>
 </html>

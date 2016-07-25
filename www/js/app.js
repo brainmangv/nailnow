@@ -38,8 +38,9 @@
     var addressLocation =null;
     var tipo_usuario='';
     var user = new User();
-    var $oauth = new Oauth('https://api.nailnow.co');
-    var USER_IMAGE_PATH= 'http://192.168.1.5/images/users/';
+    var order = {};
+    var $oauth = new Oauth('http://api.nailnow.co');
+    var USER_IMAGE_PATH= 'http://api.nailnow.co/images/users/';
     var countdown =  $("#countdown").countdown360({
         radius      : ($(document).width()/2) - 60,
         seconds     : 60,
@@ -56,22 +57,52 @@
             console.log('countdown done') 
         }
     });
+    jQuery.validator.addMethod("credit_card", function(value, element) {
+       // accept only digits, dashes or spaces
+        var respost;
+        if (/[^0-9-\s]+/.test(value)) respost = false;
+
+        // The Luhn Algorithm. It's so pretty.
+        var nCheck = 0, nDigit = 0, bEven = false;
+        value = value.replace(/\D/g, "");
+
+        for (var n = value.length - 1; n >= 0; n--) {
+            var cDigit = value.charAt(n),
+                  nDigit = parseInt(cDigit, 10);
+
+            if (bEven) {
+                if ((nDigit *= 2) > 9) nDigit -= 9;
+            }
+
+            nCheck += nDigit;
+            bEven = !bEven;
+        }
+        respost = (nCheck % 10) == 0;
+
+        return this.optional(element) || respost;
+    }, "Numero do Cartão inválido");
+    //$("#card_expiration").mask("99/9999");
+    $("#card_cvv").mask("999");
+    document.addEventListener("DOMContentLoaded",function(){
+        console.log('Domloaded');
+    },false);
     document.addEventListener("app.Ready", register_event_handlers, false);
     document.addEventListener("app.Ready", initMap, false);
     document.addEventListener("app.Ready", redirect_if_logged, false);    
-    //document.addEventListener("app.Ready", wakelock, false);
     //document.addEventListener("app.Ready", geolocationAutoUpdate, false);
     document.addEventListener("app.Ready", setupPush, false);
 
-    function register_event_handlers(){        
+    function register_event_handlers(){
+        $.afui.loadDefaultHash=false;        
         window.BOOTSTRAP_OK = true;
         console.log('appready');
-        cordova.getAppVersion().done(
-            function(v){
-                $("#appversion").html('appVersion:'+v);
-            }
-        );
-        
+        if (window.cordova){        
+            cordova.getAppVersion().done(
+                function(v){
+                    $("#appversion").html('appVersion:'+v);
+                }
+            );
+        }
         document.addEventListener("backbutton", function(e){
             console.log('backbutton');
             if($.afui.activeDiv.id=='main'){
@@ -96,12 +127,12 @@
         if( navigator.splashscreen && navigator.splashscreen.hide ) {   // Cordova API detected
             navigator.splashscreen.hide();
         }
-        update_drawer();     
+            
         
 
         //btn-login2
         $("#btn-login2").on("click",function(){
-            var validator = $('#frm_login').validate({
+            var validator = $('#frm-login').validate({
                 rules: {
                     login_email: {
                         required: true,
@@ -127,7 +158,7 @@
         $("#btn-registrou").on("click",function(){            
             // Currently only accentColor and backgroundColor is supported.
             // Note: These have no effect on Android.
-            var validator = $('#frm_registrar').validate({
+            var validator = $('#frm-registrar').validate({
                     rules: {
                         reg_nome: {
                             required: true,
@@ -154,7 +185,7 @@
                 var nome= $("#reg_nome").val();
                 var email=$("#reg_email").val();
                 var senha=$("#reg_senha").val();
-                user.signup(tipo_usuario,nome,email,senha)
+                user.signup(tipo_usuario,nome,email,senha,null)
                 .then(function(){
                     console.log("iniciando digits");
                     hide_logo_header(); 
@@ -246,19 +277,27 @@
           //google.maps.event.trigger(map,'resize');
         });
 
+       
         //panel#confirmação
-        $(".panel#confirmacao-agendamento").on("panelbeforeload",function(){
-          //hide_logo_header();
-          //wakelock();
+        $(".panel#confirmacao-agendamento").on("panelload",function(){
+            console.log("panel#confirmacao-agendamento");
+            if( update_numero_cartao( $(".cartao-credito p"))) $("#btn-confirmacao-agendamento").prop('disabled', false) 
+                else
+            $("#btn-confirmacao-agendamento").prop('disabled', true);
+
         });
 
         $("#btn-pedir").on("click",function(){
+            order={};
+            order.address=addressLocation;
             switch ($("#slider").slider("value")){
             case 1:
                 console.log('btn-pedir 1');
+                order.type="now";
                 load_confirmacao_agora();
             break;
             case 2:
+                order.type="appointment";
                 console.log('btn-pedir 2');
                 load_confirmacao_agendamento();                
             break;
@@ -285,10 +324,10 @@
                 maxDate: new Date(2016,5,30,15,44),
             });
 
-            /*$('#conf_hora').on('click',function(){
+            $('#conf_hora').on('click',function(){
                 console.log('#conf_hora');
                 $.afui.loadContent("#agenda-horarios",false,false,"up-reveal");
-            });*/
+            });
 
             /*$('#conf_hora').mobiscroll().time({
                 theme: 'android',     // Specify theme like: theme: 'ios' or omit setting to use default 
@@ -300,11 +339,23 @@
             console.log(addressLocation);
             var rua=addressLocation.address_components.find(function(p){return p.types[0]==='route'});
             var numero=addressLocation.address_components.find(function(p){return p.types[0]==='street_number'});
+            var bairro=addressLocation.address_components.find(function(p){return p.types.find(function(p){return p=='sublocality'})});
+            var cidade=addressLocation.address_components.find(function(p){return p.types.find(function(p){return p=='locality'})});
+            var uf=addressLocation.address_components.find(function(p){return p.types[0]==='administrative_area_level_1'});
+            var cep=addressLocation.address_components.find(function(p){return p.types[0]==='postal_code'});
+            order.rua = rua ? rua.long_name:'';
+            order.numero = numero ? numero.long_name.split('-')[0]:'';
+            order.bairro = bairro ? bairro.long_name:'';
+            order.cidade= cidade ? cidade.long_name:'';
+            order.uf= uf ? uf.short_name:'';
+            order.cep= cep ? cep.long_name:'';
             //.long_name.split('-')[0]
-            $("#conf_endereco").val(rua ? rua.long_name: '');
-            $("#conf_numero").val(numero ? numero.long_name.split('-')[0] :'');
-            //$("#conf_cidade").val(addressLocation.address_components.find(function(p){return p.types[0]==='locality'}).long_name);
-            //$("#conf_bairro").val(addressLocation.address_components.find(function(p){return p.types.find(function(t){return t==='sublocality_level_1'})}).long_name);
+            //$("#conf_endereco").val(order.rua);
+            $("#conf_numero").val(order.numero);
+            $("#conf_bairro").val(order.bairro);
+            $("#conf_cidade").val(order.cidade);
+            $("#conf_uf").val(order.uf);
+            $("#conf_cep").val(order.cep);            
         };
 
         function load_confirmacao_agora(){
@@ -337,24 +388,8 @@
             $("#conf_numero").val(addressLocation.address_components.find(function(p){return p.types[0]==='street_number'}).long_name);
             $("#conf_cidade").val(addressLocation.address_components.find(function(p){return p.types[0]==='locality'}).long_name);
             $("#conf_bairro").val(addressLocation.address_components.find(function(p){return p.types.find(function(t){return t==='sublocality_level_1'})}).long_name);
-        };
-
-        $("#confirmacao-servico").on('panelbeforeload',function(){
-            $oauth.getServicos().done(function(r){                
-                $("#lista-servicos").html('');
-                r._embedded.servico.
-                forEach(function(e,i){ 
-                    $("#lista-servicos").append('<div class="grid grid-pad urow vertical-col list-item">'+
-                        '<div class="col col3-4">'+
-                        '<input type="checkbox" name="srv'+i+'"'+ 
-                        'id="srv'+i+'" class="wide-control" value='+e.id+'>'+
-                        '<label for="srv'+i+'">'+e.descricao+'</label>'+
-                        '</div><div class="col col1-4"><input name="srv_qtd[]" type="number" size="2" value="1" ></div></div>')
-                });
-            })
-        });
-
-
+        };            
+    
         //slider
         $("#slider").slider({
             min: 1,
@@ -407,6 +442,7 @@
             console.log('facebook login:');
             user.loginFB()
             .done(function(){
+                update_drawer();
                 show_map();
             });
         });
@@ -416,18 +452,22 @@
             console.log('facebook registrando:');
             user.loginFB(tipo_usuario)
             .done(function(){
+                console.log('redirect if logged');
                 redirect_if_logged()
-            });
+            })
+            .fail(function(e){
+                console.log('app.js falha loginfB',e);
+            })
         });
 
         $("#conf_pgto").on("click",function(){
             var intObj = {
               template: 3, 
-              parent: '#add_cartao' // this option will insert bar HTML into this parent Element 
+              parent: '#add-cartao' // this option will insert bar HTML into this parent Element 
             };
             var indeterminateProgress = new Mprogress(intObj);
             indeterminateProgress.start();
-            $.afui.loadContent("#add_cartao", false, false, 'slide');
+            $.afui.loadContent("#add-cartao", false, false, 'slide');
         });
 
         //scan cartao de credito conf_pgto
@@ -531,12 +571,7 @@
 
         //btn-sair
         $("#btn-sair").on("click",function(){
-            user.logout();
-            window.powerManagement.release(function() {
-                console.log('Wakelock released');
-            }, function() {
-                console.log('Failed to release wakelock');
-            });
+            user.logout();            
             //alert('saindo');            
             $.afui.loadContent("#main",false,false,"slide");    
             $.afui.drawer.hide("#sidemenu"); 
@@ -555,10 +590,12 @@
             
         });
 
+        //.panel#manicure
         $(".panel#manicure").on("panelload",function(){
           show_logo_header_manicure();
         });
-
+        
+        //btn-intent
         $("#btn-intent").on("click",function(){
             console.log("#btn-intent");
             window.plugins.webintent.startActivity({
@@ -569,15 +606,305 @@
             );
         }); 
 
+        //countdown
         $("#countdown").on("click",function(){
             console.log('cronometro clicado');
         });
+       
+        //btn-confirmacao-agendamento
+        $("#btn-confirmacao-agendamento").on("click",function(){
+            $.afui.loadContent("#confirmacao-servicos",false,false,"slide"); 
+        });       
+        
+        //confirmacao-servicos
+        $("#confirmacao-servicos").on('panelbeforeload',function(){
+            $("#lista-servicos").html('');
+            $oauth.getServicos().done(function(servicos){                
+                servicos.
+                forEach(function(e,i){ 
+                    $("#lista-servicos").append('<div class="grid grid-pad urow vertical-col list-item">'+
+                        '<div class="col col3-4">'+
+                        '<input type="checkbox" name="srv'+i+'"'+ 
+                        'id="srv'+i+'" data-row="'+i+'" class="wide-control" value='+e.id+
+                        ' data-valor="'+e.preco+'" data-duracao="'+e.duracao+'" >'+
+                        '<label for="srv'+i+'">'+e.descricao+'</label>'+
+                        '</div><div class="col col1-4"><input id="srv_qtd_'+i+
+                        '" type="number" size="2" value="1" ></div></div>')
+                });
+
+                $("#lista-servicos input[type=checkbox]").on("click",function(){
+                    console.log("checked");
+                    if($('#lista-servicos input[type=checkbox]:checked').size()){
+                        $("#btn-confirmacao-servicos").prop('disabled', false)
+                        }else{
+                            $("#btn-confirmacao-servicos").prop('disabled', true)
+                        }
+                });
+            })
+        });
+
+        //btn-confirmacao-servicos
+        $("#btn-confirmacao-servicos").on("click",function(){
+            order.itens =[];
+            $('#lista-servicos input[type=checkbox]:checked').each(
+                function(id) {
+                    order.itens.push({
+                        "id":id,
+                        "qtd":$('#srv_qtd_'+$(this).attr('data-row')).val(),
+                        "valor":$(this).attr('data-valor'),
+                        "duracao":$(this).attr('data-duracao'),
+                        "descricao":$("label[for='"+$(this).attr("id")+"']").html(),
+
+                    });
+                    //console.log(e, $('#srv_qtd_'+$(i).attr('data-row')).val()) 
+                }
+            );
+            $.afui.loadContent("#confirmacao-manicures",false,false,"slide");
+        }); 
+
+        //confirmacao-manicures
+        $("#confirmacao-manicures").on('panelbeforeload',function(){
+            $("#lista-manicures").html('');
+            $oauth.getManicures().done(function(r){
+                r._embedded.usuario.
+                forEach(function(e,i){
+                    var imgSrc=e.imagem? e.imagem:'images/girl-avatar.png';
+                    var pontuacao=e.manicure_pontuacao/5*100;
+                    $("#lista-manicures").append(
+                    '<li class="grid">'+
+                        '<a class="btn-lista-manicures" data-id='+e.id+'>'+
+                        '<img src="'+imgSrc+'">'+
+                        '<div class="nome" >'+e.nome+'</div>'+
+                        '<div class="star-ratings">'+
+                            '<div class="star-ratings-sprite" style="">'+
+                                '<span style="width:'+pontuacao+'%" class="star-ratings-sprite-rating"></span>'+
+                            '</div>'+
+                            '<p>'+e.num_avaliacoes+' avaliacoes</p>'+
+                        '</div>'+
+                        '</a>'+
+                    '</li>');
+                });               
+                $(".btn-lista-manicures").on("click",function(e){
+                    order.manicure =e.currentTarget.dataset.id;
+                    console.log(order);            
+                    $.afui.loadContent("#confirmacao-data-hora",false,false,"slide");                    
+                });     
+             });
+        });        
+
+        //btn-data
+        $("#btn-data").on("click",function(){
+            $.afui.loadContent("#selecionar-data",false,false,"cover"); 
+        });
+
+        //btn-hora
+        $("#btn-hora").on("click",function(){
+            if (!order.data){
+                $.afui.popup('Selecione uma data primeiro.');
+                return;
+            }
+            $.afui.loadContent("#selecionar-hora",false,false,"cover"); 
+        });
+
+        //selecionar-data
+        $("#selecionar-data").on("panelbeforeload",function(){
+           console.log("selecionar-data");
+            $("#selecionar-data ul").html('');
+            var diaDaSemana=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sabádo'];
+            var d = new Date();
+            for (var i=0;i<15;i++){
+                var f= new Date();
+                f.setDate(d.getDate()+i); 
+                $("#selecionar-data ul").append('<li><a data-data="'+f+'">'+f.toLocaleDateString()+' - '+diaDaSemana[f.getDay()]+'</a></li>');
+            }
+
+            $("#selecionar-data li a").on("click",function(e){            
+                var data =new Date(e.target.dataset.data);
+                var diaDaSemana=['Segunda','Terça','Quarta','Quinta','Sexta','Sabádo','Domingo'];
+                order.data=data;
+                $("#btn-data").html('<i class="fa fa-calendar" aria-hidden="true"></i>&nbsp; '+data.toLocaleDateString()+' - '+diaDaSemana[data.getDay()]);
+                console.log('a',e.target.dataset.data);
+                $.afui.goBack();
+            });
+            
+        });        
+
+        //selecionar-hora
+        $("#selecionar-hora").on("panelbeforeload",function(){
+            var dia=order.data.getFullYear()+'-'+order.data.getMonth()+"-"+order.data.getDate();
+            $("#selecionar-hora ul").html('');
+            $oauth.getagendamentoHoras(dia,order.manicure).done(function(response){
+                var agenda=response._embedded.agendamento;
+                var time = new Date();
+                if (order.data.getDay() == time.getDay()){                  
+                    time.setHours(time.getHours()+1);
+                    time.setSeconds(0);
+                    if (time.getMinutes()>30){
+                        time.setMinutes(30)
+                    }else{
+                        time.setMinutes(0);
+                    }                
+                }else{
+                    //var time = order.data;
+                    time.setHours(8);
+                    time.setSeconds(0);
+                    time.setMinutes(0);
+                }
+                if (time.getHours()>17){
+                    $("#selecionar-hora ul").html('<p style="text-align: center">Não existe horário disponivel para essa data.</p>');
+                }                  
+                while(time.getHours()<=17){
+                    $("#selecionar-hora ul").append('<li><a data-hora="'+time.toLocaleTimeString()+'">'+time.toLocaleTimeString().substring(0,5)+'</a></li>');
+                    time=new Date(time.getTime() + 30*60000);    
+                }
+
+                $("#selecionar-hora li a").on("click",function(e){
+                    var hora=e.target.dataset.hora;
+                    order.hora=hora;                
+                    console.log(hora);
+                    $("#btn-hora").html('<i class="fa fa-clock-o" aria-hidden="true"></i>&nbsp; '+hora.substring(0,5));
+                    $("#btn-confirmacao-data-hora").prop('disabled', false);
+                    $.afui.setBackButtonVisibility(true);
+                    $.afui.goBack();
+                });  
+            });
+
                
+        });
+
+        //btn-confirmacao-data-hora
+        $("#btn-confirmacao-data-hora").on("click",function(){
+            $.afui.loadContent("#confirmacao-resumo");
+        });
+        
+        //confirmacao-resumo
+        $("#confirmacao-resumo").on("panelbeforeload",function(){
+            $("#resumo-endereco").html(order.address.formatted_address);
+            $("#resumo-data").html(order.data.toLocaleDateString());
+            $("#resumo-hora").html(order.hora.substring(0,5));
+            $("#resumo-cartao").html("Cartão "+user.current.cartao_tipo+" **** **** **** "+user.current.cartao_final);    
+            $("#resumo-servicos").html('');
+            var total =0;
+            order.itens.forEach(function(item) {
+                total+=(item.valor*item.qtd);
+                $('#resumo-servicos').append('<li class="urow">'+	
+                        '<div class="col col3-4">'+item.descricao +' x'+item.qtd+'</div>'+
+                        '<div class="col col1-4 last">R$ '+item.valor*item.qtd+'</div>'+
+                    '</li>');                    
+            }, this);
+            $('#resumo-servicos').append('<li class="urow total">'+
+                '<div class="col col3-4">Total</div>'+
+                '<div class="col col1-4 last"><span id="resumo-total">R$ '+total+'</span></div>'+
+            '</li>');
+        });
+
+        //btn-confirmacao-resumo
+        $("#btn-confirmacao-data-hora").on("click",function(){
+            
+        });
+        
+        //meios-pgto
+        $("#meios-pgto").on("panelbeforeload",function(){
+            update_numero_cartao($(".cartao-credito p"));
+        });
+
+        $("#confirmacao-agendamento .cartao-credito p").on("click",function(){
+            $.afui.loadContent("#add-cartao",false,false,"slide"); 
+        });
+             
+
+        $("#btn-meios-pgto-add").on("click",function(){
+            $.afui.loadContent("#add-cartao",false,false,"slide"); 
+        });
+
+        $("#add-cartao").on("panelbeforeload",function(){
+            $("#card_expiration").mask("99/9999");
+            $("#holder_name").val('');
+            $("#card_number").val('');
+            $("#card_expiration").val('');
+            $("#card_cvv").val('');            
+        });
+
+        $("#btn-add-cartao").on("click",function(){
+            var validator = $('#frm-add-cartao').validate({
+                rules: {
+                    holder_name: {
+                        required: true,
+                    },
+                    card_number: {
+                        credit_card: true,
+                        required:true,
+                        minlength: 12
+                    },
+                    card_expiration: {
+                        required:true,
+                        minlength: 5
+                    },
+                    card_cvv: {
+                        required:true,
+                        minlength: 3,
+                        maxlength: 3 
+                    },
+                }
+            });
+            if (validator.form()){
+                var holder_name = $("#holder_name").val();
+                var card_expiration = $("#card_expiration").val();
+                var card_number = $("#card_number").val();
+                var card_cvv = $("#card_cvv").val();
+                var payment_method_code = 'credit_card';
+                var payment_company_code = bandeira_cartao(card_number);
+
+                user.addCartao(holder_name,card_expiration,card_number,card_cvv,payment_method_code,payment_company_code,user.current.vindi_id,user.current.id)
+                .done(function(r){
+                    //user.current.cartao_tipo= r.payment_profile.payment_company.code;
+                    //user.current.cartao_final= r.payment_profile.card_number_last_four;
+                    user.setCurrentUser().done(function(){
+                        update_numero_cartao($(".cartao-credito p"));
+                    });
+                    
+                    $.afui.popup({title:'Sucesso',message:'cartão adicionado com sucesso',cancelOnly:true,cancelText:'OK'})
+                })
+                .fail(function(e){
+                    $.afui.popup({title:'Erro de Validação',message:'Erro ao cadastrar o cartão, verifique os dados informados',cancelOnly:true,cancelText:'OK'})
+                });                
+            } 
+        });
+             
     } //register_event_handlers
 
+    function update_numero_cartao(placeholder){
+        placeholder.removeClass();
+        if (user.current.cartao_tipo){
+            placeholder.addClass(user.current.cartao_tipo);
+            placeholder.html('CARTÃO FINAL ...'+user.current.cartao_final);
+            return true;
+        }
+        return false;
+    }
+
+    function bandeira_cartao(num) {        
+        var visa= /^4[0-9]{12}(?:[0-9]{3})$/;        
+        var mastercard= /^5[1-5][0-9]{14}$/;
+        var amex= /^3[47][0-9]{13}$/;
+        var dinersclub= /^3(?:0[0-5]|[68][0-9])[0-9]{11}$/;
+        var discovery= /^6(?:011|5[0-9]{2})[0-9]{12}$/;
+        var jcb= /^((2131)|(1800)|(35)\d{3})\d{11}$/;
+        var elo=/^((((636368)|(438935)|(504175)|(451416)|(636297))\d{0,10})|((5067)|(4576)|(4011))\d{0,12})$/;
+
+        if (visa.test(num)) return 'visa';
+        if (mastercard.test(num)) return 'mastercard';
+        if (amex.test(num)) return 'american_express';
+        if (discovery.test(num)) return 'discovery';
+        if (dinersclub.test(num)) return 'diners_club';
+        if (jcb.test(num)) return 'jcb'; 
+        if (elo.test(num)) return 'elo';
+    }
+
     function redirect_if_logged(){
-        if(!$oauth.isExpired() ){
+        if(!$oauth.isExpired()){
             if(user.getCurrentUser()){                
+                update_drawer();
                 switch(user.current.tipo){
                     case 'C':
                         show_map();
@@ -587,15 +914,9 @@
                         break;               
                 }
             }
+        }else{
+           $.afui.loadContent("#main",false,false,"slide");
         }
-    }
-
-    function wakelock(){
-        window.powerManagement.dim(function() {
-            console.log('Wakelock acquired');
-            }, function() {
-            console.log('Failed to acquire wakelock');
-        });
     }
 
     function stopWatch(id){

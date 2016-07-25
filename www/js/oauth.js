@@ -3,12 +3,14 @@ function Oauth(apiurl){
 	this.apiUrl=apiurl;
 	this.oauthUrl=this.apiUrl+'/oauth';
 	this.signupUrl =this.apiUrl+'/signup';
-	this.signupFBUrl =this.apiUrl+'/signup';
 	this.identityUrl =this.apiUrl+'/identity';
 	this.checkFacebookidUrl=this.apiUrl+ '/check/facebookid';
 	this.checkEmailUrl=this.apiUrl+ '/check/email';
-	this.updateUserUrl=this.apiUrl+ '/usuario';
-	this.apiurlServico=this.apiUrl+ '/servico';
+	this.apiUrlUsuario=this.apiUrl+ '/usuario';
+	this.apiUrlServico=this.apiUrl+ '/servico';
+	this.addCartaoURL =this.apiUrl+ '/addcartao';
+	this.agendamentoURL =this.apiUrl+ '/agendamento';	
+	this.servicos=null;
 	var access_token;
 	var refresh_token;
 }
@@ -224,25 +226,61 @@ Oauth.prototype ={
 	    return isExpired;
 	},
 
-	checkFacebookid: function(facebookid){
+	checkFacebookid: function(facebookid, token){
 		that=this;
-		return this.get(this.checkFacebookidUrl +"/"+ facebookid, false)
-		.done(function(data){
-			that.setToken(data.token.access_token,data.token.expires_in);
-			that.setRefreshToken(data.token.refresh_token);
-			//console.log('token',data.token);
-		})	;
+		data= {
+			facebookid :facebookid,
+			token: token
+		}
+
+		return this.post(this.checkFacebookidUrl, data , false)
+			.done(function(data){
+				that.setToken(data.token.access_token,data.token.expires_in);
+				that.setRefreshToken(data.token.refresh_token);
+				//console.log('token',data.token);
+			});
 	},
 
-	checkEmail: function(facebookid,email){
-		return this.get(this.checkEmailUrl + facebookid +"/"+email, false);
+	checkEmail: function(facebookid,token){
+		data={
+			facebookid:facebookid,
+			token:token
+		};
+		return this.post(this.checkEmailUrl ,data, false);
 	},
 
 	updateUser: function(id,detail){
-		return this.patch(this.updateUserUrl+"/"+id,detail,true);
+		return this.patch(this.apiUrlUsuario+"/"+id,detail,true);
 	},
 
 	getServicos: function(){
-		return this.get(this.apiurlServico);
+		var d = $.Deferred();
+		var that=this;
+		if(this.servicos == null){ 
+			this.get(this.apiUrlServico)
+				.done(function(response){
+					console.log('servicos',response._embedded.servico);
+					that.servicos = response._embedded.servico;
+					d.resolve(that.servicos);	
+				})
+				.fail(function(error){
+					d.reject(error)
+				});
+		}else{
+			d.resolve(this.servicos);
+		}		
+		return d.promise();
+	},
+
+	getManicures: function(){
+		return this.get(this.apiUrlUsuario+"?tipo=M");
+	},
+
+	addCartao : function(data){		
+		return this.post(this.addCartaoURL,data);
+	},
+
+	getagendamentoHoras : function(data,manicure){		
+		return this.get(this.agendamentoURL+'?data='+data+'&manicure='+manicure+'&fields=id,hora,manicure');
 	}
 }
