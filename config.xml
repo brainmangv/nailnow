@@ -75,7 +75,8 @@
     <plugin name="cordova-plugin-vibration" source="npm" />
     <plugin source="git" spec="https://github.com/Viras-/cordova-plugin-powermanagement.git" />
     <plugin name="cordova-plugin-x-socialsharing" source="npm" />
-
+    <plugin name="cordova-plugin-inappbrowser" source="npm" />
+ 
     <plugin name="phonegap-plugin-push" source="npm">
         <param name="SENDER_ID" value="499027471276" />
     </plugin>

@@ -104,7 +104,6 @@
         }
         
         //backbutton
-       /*
         document.addEventListener("backbutton", function(e){
             console.log('backbutton');
             if($.afui.activeDiv.id=='main'){
@@ -112,10 +111,10 @@
                 navigator.app.exitApp();
             }
             else {
-                navigator.app.backHistory()
+                $.afui.goBack();
+                //navigator.app.backHistory()
             }
         }, false);
-*/
         if (window.cordova){
             switch (window.cordova.platformId){
                 case 'browser':
