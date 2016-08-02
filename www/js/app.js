@@ -80,17 +80,16 @@
         respost = (nCheck % 10) == 0;
 
         return this.optional(element) || respost;
-    }, "Numero do Cartão inválido");
-    //$("#card_expiration").mask("99/9999");
-    $("#card_cvv").mask("999");
+    }, "Por favor, forneça um numero válido.");
     document.addEventListener("DOMContentLoaded",function(){
         console.log('Domloaded');
     },false);
     document.addEventListener("app.Ready", register_event_handlers, false);
     document.addEventListener("app.Ready", initMap, false);
-    document.addEventListener("app.Ready", redirect_if_logged, false);    
+    document.addEventListener("app.Ready", redirect_if_logged, false);
+    //document.addEventListener("app.Ready", deviceSim, false);
     //document.addEventListener("app.Ready", geolocationAutoUpdate, false);
-    document.addEventListener("app.Ready", setupPush, false);
+    //document.addEventListener("app.Ready", setupPush, false);
 
     function register_event_handlers(){
         $.afui.loadDefaultHash=false;        
@@ -103,6 +102,8 @@
                 }
             );
         }
+        
+        //backbutton
         document.addEventListener("backbutton", function(e){
             console.log('backbutton');
             if($.afui.activeDiv.id=='main'){
@@ -124,11 +125,10 @@
                     break;    
             }
         }
+
         if( navigator.splashscreen && navigator.splashscreen.hide ) {   // Cordova API detected
             navigator.splashscreen.hide();
         }
-            
-        
 
         //btn-login2
         $("#btn-login2").on("click",function(){
@@ -181,32 +181,32 @@
               accentColor: '#ff0000',
               backgroundColor: '#ffffff',
             };
-            if (validator.form()){
-                var nome= $("#reg_nome").val();
-                var email=$("#reg_email").val();
-                var senha=$("#reg_senha").val();
-                user.signup(tipo_usuario,nome,email,senha,null)
-                .then(function(){
-                    console.log("iniciando digits");
-                    hide_logo_header(); 
-                    try{
-                        window.plugins.digits.authenticate(options,
-                          function (oAuthHeaders) {
-                            console.log(oAuthHeaders);
-                            if (tipo_usuario=='M')                         
-                                $.afui.loadContent("#manicure",false,false,"slide")
-                            else show_map();    
-                          },
-                          function(error) {
+            if (validator.form()){                
+                console.log("iniciando digits");
+                hide_logo_header(); 
+                try{
+                    window.plugins.digits.authenticate(options,
+                        function (oAuthHeaders) {
+                            var nome =$("#reg_nome").val();
+                            var email=$("#reg_email").val();
+                            var senha=$("#reg_senha").val();
+                            var telefone=oAuthHeaders.phonenumber;
+                            console.log('Digits:: ',oAuthHeaders);
+
+                            user.signup(tipo_usuario,nome,email,senha,telefone,null)
+                                .then(function(){
+                                    if (tipo_usuario=='M')                         
+                                        $.afui.loadContent("#manicure",false,false,"slide")
+                                    else show_map();
+                                });
+                        },
+                        function(error) {
                             console.warn("[Digits]", "Login failed", error);
-                          }
-                        );
-                    }catch (e){
-                        console.log(e);
-                    }
-                    
-                 });            
-                
+                        }
+                    );
+                }catch (e){
+                    console.log(e);
+                }                   
             }
         });
         
@@ -282,9 +282,7 @@
         $(".panel#confirmacao-agendamento").on("panelload",function(){
             console.log("panel#confirmacao-agendamento");
             if( update_numero_cartao( $(".cartao-credito p"))) $("#btn-confirmacao-agendamento").prop('disabled', false) 
-                else
-            $("#btn-confirmacao-agendamento").prop('disabled', true);
-
+            else $("#btn-confirmacao-agendamento").prop('disabled', true);
         });
 
         $("#btn-pedir").on("click",function(){
@@ -293,11 +291,11 @@
             switch ($("#slider").slider("value")){
             case 1:
                 console.log('btn-pedir 1');
-                order.type="now";
+                order.tipo="now";
                 load_confirmacao_agora();
             break;
             case 2:
-                order.type="appointment";
+                order.tipo="agendamento";
                 console.log('btn-pedir 2');
                 load_confirmacao_agendamento();                
             break;
@@ -337,25 +335,27 @@
             });*/
 
             console.log(addressLocation);
-            var rua=addressLocation.address_components.find(function(p){return p.types[0]==='route'});
+            var endereco=addressLocation.address_components.find(function(p){return p.types[0]==='route'});
             var numero=addressLocation.address_components.find(function(p){return p.types[0]==='street_number'});
             var bairro=addressLocation.address_components.find(function(p){return p.types.find(function(p){return p=='sublocality'})});
             var cidade=addressLocation.address_components.find(function(p){return p.types.find(function(p){return p=='locality'})});
             var uf=addressLocation.address_components.find(function(p){return p.types[0]==='administrative_area_level_1'});
             var cep=addressLocation.address_components.find(function(p){return p.types[0]==='postal_code'});
-            order.rua = rua ? rua.long_name:'';
+            order.endereco = endereco ? endereco.long_name:'';
             order.numero = numero ? numero.long_name.split('-')[0]:'';
             order.bairro = bairro ? bairro.long_name:'';
             order.cidade= cidade ? cidade.long_name:'';
             order.uf= uf ? uf.short_name:'';
             order.cep= cep ? cep.long_name:'';
+            order.telefone= user.current.telefone ? user.current.telefone.replace('+55',''):'';
             //.long_name.split('-')[0]
-            //$("#conf_endereco").val(order.rua);
+            $("#conf_endereco").val(order.endereco);
             $("#conf_numero").val(order.numero);
             $("#conf_bairro").val(order.bairro);
             $("#conf_cidade").val(order.cidade);
             $("#conf_uf").val(order.uf);
-            $("#conf_cep").val(order.cep);            
+            $("#conf_cep").val(order.cep);
+            $("#conf_telefone").val(order.telefone);            
         };
 
         function load_confirmacao_agora(){
@@ -441,9 +441,9 @@
         $("#btn-facebook-login").on("click",function(){
             console.log('facebook login:');
             user.loginFB()
-            .done(function(){
+            .done(function(){                
                 update_drawer();
-                show_map();
+                show_map();                
             });
         });
 
@@ -451,9 +451,25 @@
         $("#btn-facebook-registrar").on("click",function(){
             console.log('facebook registrando:');
             user.loginFB(tipo_usuario)
-            .done(function(){
-                console.log('redirect if logged');
-                redirect_if_logged()
+            .done(function(){                
+                try{
+                    window.plugins.digits.authenticate(
+                        {accentColor: '#ff0000',backgroundColor: '#ffffff'},
+                        function (oAuthHeaders) {
+                            var telefone=oAuthHeaders.phonenumber;
+                            $oauth.updateUser(user.current.id,{"telefone": telefone})
+                                .done(function(){
+                                    console.log('redirect if logged');
+                                    redirect_if_logged();
+                                });
+                        },
+                        function(error) {
+                            console.warn("[Digits]", "Login failed", error);
+                        }
+                    );
+                }catch (e){
+                    console.log(e);
+                }                
             })
             .fail(function(e){
                 console.log('app.js falha loginfB',e);
@@ -521,6 +537,37 @@
              $.afui.loadContent("#historico",false,false,"slide");
         });
 
+        //historico
+        $("#historico").on("panelload",function(){
+            $("#historico").html('<ul class="list"></ul>');
+            $oauth.getagendamentoCliente(user.current.id)
+                .done(function(r){
+                    var mes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                                'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+                    var diaDaSemana=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sabádo'];                    
+                    r._embedded.agendamento.forEach(function(i){
+                        var d=new Date(i.data_hora);                      
+                        $("#historico ul.list").append('<li>'+
+                            '<a data-id="'+i.id+'"> <div class="urow">'+
+                            '<div class="col col1-4"><img src="images/no-user-image.png" id="userimg"></div>'+
+                            '<div class="col col3-4 last">'+
+                                '<p>'+i.nome+'</p>'+
+                                    '<p>Agendado - '+ diaDaSemana[d.getDay()]+' ' +d.getDate()+'/'+
+                                    mes[d.getMonth()] + ' '+i.data_hora.substr(-5)+'</p>'+
+                                    '<p>R$ '+i.total+' <span>'+i.status+'</span> </p>'+
+                            '</div></div></a></li>');                    
+                    })
+                    
+                })
+                .fail(function(e){
+                    $("#historico").html('<div class="grid grid-pad urow uib_row_10 row-height-10" data-uib="layout/row" data-ver="0">'+
+                        '<div class="col uib_col_17 col-0_12-12" data-uib="layout/col" data-ver="0">'+
+                        '<div class="vcenter-historico">Histórico Vazio.<br>Seus atendimentos serão listados aqui.</div>'+
+                        '</div>'+
+                    '</div>');
+                })
+        });
+
         //btn-meios-pgto
         $("#btn-meios-pgto").on("click",function(){
              hide_logo_header();
@@ -549,7 +596,8 @@
                     cssClasses: '',
                     handler: function () {
                         alert("goodbye");
-                    }
+        
+                }
                 },{
                     text: 'Google+',
                     cssClasses: '',
@@ -612,8 +660,18 @@
         });
        
         //btn-confirmacao-agendamento
-        $("#btn-confirmacao-agendamento").on("click",function(){
-            $.afui.loadContent("#confirmacao-servicos",false,false,"slide"); 
+        $("#btn-confirmacao-agendamento").on("click",function(){            
+            if($("#frm-confirmacao-agendamento").valid()){ 
+                order.endereco = $("#conf_endereco").val();
+                order.numero =$("#conf_numero").val();
+                order.bairro = $("#conf_bairro").val();
+                order.cidade= $("#conf_cidade").val();
+                order.uf= $("#conf_uf").val();
+                order.cep= $("#conf_cep").val();
+                order.telefone= $("#conf_telefone").val();
+                order.cliente_id= user.current.id;
+                $.afui.loadContent("#confirmacao-servicos",false,false,"slide");
+            } 
         });       
         
         //confirmacao-servicos
@@ -645,17 +703,18 @@
 
         //btn-confirmacao-servicos
         $("#btn-confirmacao-servicos").on("click",function(){
-            order.itens =[];
+            order.servicos =[];
+            order.duracao=0;
             $('#lista-servicos input[type=checkbox]:checked').each(
                 function(id) {
-                    order.itens.push({
+                    order.servicos.push({
                         "id":id,
                         "qtd":$('#srv_qtd_'+$(this).attr('data-row')).val(),
                         "valor":$(this).attr('data-valor'),
                         "duracao":$(this).attr('data-duracao'),
-                        "descricao":$("label[for='"+$(this).attr("id")+"']").html(),
-
+                        "descricao":$("label[for='"+$(this).attr("id")+"']").html()
                     });
+                    order.duracao+=($(this).attr('data-duracao')*$('#srv_qtd_'+$(this).attr('data-row')).val());
                     //console.log(e, $('#srv_qtd_'+$(i).attr('data-row')).val()) 
                 }
             );
@@ -685,7 +744,7 @@
                     '</li>');
                 });               
                 $(".btn-lista-manicures").on("click",function(e){
-                    order.manicure =e.currentTarget.dataset.id;
+                    order.manicure_id =e.currentTarget.dataset.id;
                     console.log(order);            
                     $.afui.loadContent("#confirmacao-data-hora",false,false,"slide");                    
                 });     
@@ -699,7 +758,7 @@
 
         //btn-hora
         $("#btn-hora").on("click",function(){
-            if (!order.data){
+            if (!order.data_hora){
                 $.afui.popup('Selecione uma data primeiro.');
                 return;
             }
@@ -720,8 +779,8 @@
 
             $("#selecionar-data li a").on("click",function(e){            
                 var data =new Date(e.target.dataset.data);
-                var diaDaSemana=['Segunda','Terça','Quarta','Quinta','Sexta','Sabádo','Domingo'];
-                order.data=data;
+                var diaDaSemana=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sabádo'];
+                order.data_hora=data;
                 $("#btn-data").html('<i class="fa fa-calendar" aria-hidden="true"></i>&nbsp; '+data.toLocaleDateString()+' - '+diaDaSemana[data.getDay()]);
                 console.log('a',e.target.dataset.data);
                 $.afui.goBack();
@@ -731,12 +790,14 @@
 
         //selecionar-hora
         $("#selecionar-hora").on("panelbeforeload",function(){
-            var dia=order.data.getFullYear()+'-'+order.data.getMonth()+"-"+order.data.getDate();
             $("#selecionar-hora ul").html('');
-            $oauth.getagendamentoHoras(dia,order.manicure).done(function(response){
+            var dia=order.data_hora.getFullYear()+'-'+('00'+(order.data_hora.getMonth()+1)).slice(-2)+"-"+order.data_hora.getDate();
+            $oauth.getagendamentoHoras(dia,order.manicure_id).done(function(response){
                 var agenda=response._embedded.agendamento;
-                var time = new Date();
-                if (order.data.getDay() == time.getDay()){                  
+                var time = order.data_hora;
+                var hoje = new Date();
+                //se o pedido for hoje começa no horario atual
+                if (order.data_hora.getDay() == hoje.getDay()){                  
                     time.setHours(time.getHours()+1);
                     time.setSeconds(0);
                     if (time.getMinutes()>30){
@@ -744,29 +805,47 @@
                     }else{
                         time.setMinutes(0);
                     }                
+                //começa as 8:00    
                 }else{
-                    //var time = order.data;
                     time.setHours(8);
                     time.setSeconds(0);
                     time.setMinutes(0);
                 }
+                
                 if (time.getHours()>17){
                     $("#selecionar-hora ul").html('<p style="text-align: center">Não existe horário disponivel para essa data.</p>');
-                }                  
+                }
+
                 while(time.getHours()<=17){
-                    $("#selecionar-hora ul").append('<li><a data-hora="'+time.toLocaleTimeString()+'">'+time.toLocaleTimeString().substring(0,5)+'</a></li>');
+                    if (permiteAgendar(time,agenda))
+                        $("#selecionar-hora ul").append('<li><a data-hora="'+time.toLocaleTimeString()+'">'+time.toLocaleTimeString().substring(0,5)+'</a></li>');
                     time=new Date(time.getTime() + 30*60000);    
                 }
 
                 $("#selecionar-hora li a").on("click",function(e){
                     var hora=e.target.dataset.hora;
-                    order.hora=hora;                
+                    order.data_hora.setHours(hora.substring(0,2));
+                    order.data_hora.setMinutes(hora.substring(3,5));
+                    order.data_hora.setSeconds(hora.substring(6,8));                
                     console.log(hora);
                     $("#btn-hora").html('<i class="fa fa-clock-o" aria-hidden="true"></i>&nbsp; '+hora.substring(0,5));
                     $("#btn-confirmacao-data-hora").prop('disabled', false);
                     $.afui.setBackButtonVisibility(true);
                     $.afui.goBack();
                 });  
+
+                function permiteAgendar(time,agenda){
+                    var permite=true;
+                    agenda.forEach(function(e,i,a){
+                        var inicio= new Date(e.data_hora);
+                        var fim  = new Date(e.data_hora_fim);                        
+                        if (time >=inicio && time< fim){
+                            console.log('nao',time,e);
+                            permite=false;
+                        }
+                    });
+                    return permite;
+                }
             });
 
                
@@ -774,24 +853,26 @@
 
         //btn-confirmacao-data-hora
         $("#btn-confirmacao-data-hora").on("click",function(){
+            order.data_hora_fim=new Date(order.data_hora.getTime() + (order.duracao*60000));
             $.afui.loadContent("#confirmacao-resumo");
         });
         
         //confirmacao-resumo
         $("#confirmacao-resumo").on("panelbeforeload",function(){
             $("#resumo-endereco").html(order.address.formatted_address);
-            $("#resumo-data").html(order.data.toLocaleDateString());
-            $("#resumo-hora").html(order.hora.substring(0,5));
+            $("#resumo-data").html(order.data_hora.toLocaleDateString());
+            $("#resumo-hora").html(order.data_hora.getHours()+':'+order.data_hora.getMinutes());
             $("#resumo-cartao").html("Cartão "+user.current.cartao_tipo+" **** **** **** "+user.current.cartao_final);    
             $("#resumo-servicos").html('');
             var total =0;
-            order.itens.forEach(function(item) {
+            order.servicos.forEach(function(item) {
                 total+=(item.valor*item.qtd);
                 $('#resumo-servicos').append('<li class="urow">'+	
                         '<div class="col col3-4">'+item.descricao +' x'+item.qtd+'</div>'+
                         '<div class="col col1-4 last">R$ '+item.valor*item.qtd+'</div>'+
                     '</li>');                    
             }, this);
+            order.total=total;
             $('#resumo-servicos').append('<li class="urow total">'+
                 '<div class="col col3-4">Total</div>'+
                 '<div class="col col1-4 last"><span id="resumo-total">R$ '+total+'</span></div>'+
@@ -799,8 +880,26 @@
         });
 
         //btn-confirmacao-resumo
-        $("#btn-confirmacao-data-hora").on("click",function(){
-            
+        $("#btn-confirmacao-resumo").on("click",function(){
+            var data=order;
+            delete data.address;
+            delete data.duracao;
+            //data.data_hora= order.data_hora.toLocaleDateString();
+            $oauth.agendar(data)
+            .done(function(r){
+                  console.log('resposta',r);
+                   $.afui.popup( {
+                        title:"Sucesso",
+                        message:"Seu agendamento foi confirmado, breve a profissional entrará em contato com você.",
+                        cancelText:"Ok",
+                        cancelCallback: function(){$.afui.loadContent("#mapa",false,false,"slide"); },
+                        cancelOnly:true
+                    });
+                
+            })
+            .fail(function(e){
+                $.afui.popup({title:'Falha',message:'Ocorreu uma falha no agendamento',cancelOnly:true,cancelText:'OK'})
+            });
         });
         
         //meios-pgto
@@ -857,12 +956,10 @@
 
                 user.addCartao(holder_name,card_expiration,card_number,card_cvv,payment_method_code,payment_company_code,user.current.vindi_id,user.current.id)
                 .done(function(r){
-                    //user.current.cartao_tipo= r.payment_profile.payment_company.code;
-                    //user.current.cartao_final= r.payment_profile.card_number_last_four;
-                    user.setCurrentUser().done(function(){
-                        update_numero_cartao($(".cartao-credito p"));
-                    });
+                    user.current.cartao_tipo= r.payment_profile.payment_company.code;
+                    user.current.cartao_final= r.payment_profile.card_number_last_four;                    
                     
+                    update_numero_cartao($(".cartao-credito p"));                    
                     $.afui.popup({title:'Sucesso',message:'cartão adicionado com sucesso',cancelOnly:true,cancelText:'OK'})
                 })
                 .fail(function(e){
@@ -873,6 +970,17 @@
              
     } //register_event_handlers
 
+    function deviceSim() {
+        window.plugins.sim.getSimInfo(function (result) {
+            device.sim=result;
+            console.log(result);
+            }, 
+            function (error) {
+                console.log(error);
+            }
+        ); 
+    }
+    
     function update_numero_cartao(placeholder){
         placeholder.removeClass();
         if (user.current.cartao_tipo){

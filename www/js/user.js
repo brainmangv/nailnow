@@ -2,7 +2,7 @@ function User() {
 	/* This contains the currently logged in user */
 	this.current=null;
 	
-	this.signup = function (tipo, nome, email, senha , facebookid) {
+	this.signup = function (tipo, nome, email, senha , telefone, facebookid) {
 		
 		var that=this;
 		var d = $.Deferred();
@@ -12,6 +12,7 @@ function User() {
 			nome: nome,
 			email: email,
 			senha: senha,
+			telefone: telefone,
 			facebookid: facebookid
 		}
 				
@@ -72,13 +73,12 @@ function User() {
 	/*
 	Get user data from DB and set localStorage
 	*/
-	this.setCurrentUser = function(){				
+	this.setCurrentUser = function(){
 		var d = $.Deferred();
 		var that=this;
 		$oauth.identity()
 		.success(function(response){
-			that.current= response.usuario;
-			
+			that.current= response.usuario;			
 			var user_imagem 	= response.usuario.imagem;
 			var user_facebookid = response.usuario.facebookid;
 			var imagemSrc;

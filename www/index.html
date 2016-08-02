@@ -83,7 +83,7 @@
     <audio id="beepSound" src="sound/beep.mp3" type="audio/mpeg" ></audio>
     <div id="fb-root"></div>  
     
-    <div class="view">
+    <!--div class="view">
         <div class="pages">
             <div id="splash" class="upage-content vertical-col panel active"  data-title=" " data-header="none" data-footer="none">
                 <div class="grid urow uib_row_7" data-uib="layout/row" data-ver="0">
@@ -96,7 +96,7 @@
                 </div>
             </div>
         </div>        
-    </div>    
+    </div -->    
 
     <div class="view" id="mainview">
         <header id="af-header-0">
@@ -208,7 +208,7 @@
                             </div>
 
                             <div class="table-thing with-label widget uib_w_14" data-uib="app_framework/input" data-ver="1">
-                                <label class="narrow-control label-top-left" for="reg_telefone">TELEFONE</label>
+                                <label class="narrow-control label-top-left" for="reg_telefone">CELULAR</label>
                                 <input class="wide-control" placeholder="Seu telefone com DDD" type="tel" name="reg_telefone" id="reg_telefone" required>
                             </div>
 
@@ -293,7 +293,7 @@
                         <h1><i class="fa fa-map-marker fa-1x" aria-hidden="true"></i>Endereço de atendimento</h1>
                         
                         <div class="col col3-4">
-                            <input class="wide-control" placeholder="Endereço" type="text" id="conf_endereco" v-model="conf_endereco" v-on="blur:showAlert" required>
+                            <input class="wide-control" placeholder="Endereço" type="text" id="conf_endereco" required>
                         </div>
                         <div class="col last col1-4 last">
                             <input class="wide-control" placeholder="Numero" type="number" id="conf_numero" required>
@@ -311,17 +311,19 @@
                         </div>
 
                         <div class="col col2-4 last">
-                        <input class="wide-control" placeholder="UF" type="text" id="conf_uf" maxlength=2>
+                        <input class="wide-control" placeholder="UF" type="text" id="conf_uf" maxlength=2 required>
                         </div>
 
-                        <div class="col col2-4">
-                        <input class="wide-control" placeholder="CEP" data-mask="00000-000" type="text" id="conf_cep" required>
+                        <div class="grid urow">
+                            <div class="col col2-4">
+                            <input class="wide-control" placeholder="CEP" data-mask="00000-000" title="Informe o CEP no formato 99999-999" type="text" name="conf_cep" id="conf_cep" minlength=9 required>
+                            </div>
+
+                            <div class="col col2-4 last">
+                            <input class="wide-control" placeholder="Telefone de Contato" type="tel" id="conf_telefone" name="conf_telefone" required>
+                            </div>
                         </div>
 
-                        <div class="col col2-4 last">
-                        <input class="wide-control" placeholder="Telefone de Contato" data-mask="(00) 00000-0000" type="text" id="conf_telefone">
-                        </div>
-                        
                         <h1><i class="fa fa-credit-card fa-1x" aria-hidden="true"></i>Forma de Pagamento</h1>
                         <div class="cartao-credito" style="margin-bottom: 60px;">
                             <p class="visa">Adicione um Cartão de Credito</p>    
@@ -476,7 +478,7 @@
                     <button class="button btn-pink" id="btn-confirmacao-resumo">Confirmar Pedido </button>
                 </div>
             </div>
-            
+
             <!-- Adicionar Cartão-->
             <div class="upage-content panel vertical-col" data-title="Adicionar Cartão" data-header="af-header-1" id="add-cartao">
                 <form id="frm-add-cartao" action="#">
@@ -492,11 +494,11 @@
                             <a class="button icon camera btn-pink" id="btn_digitalizar"></a>
                         </div>
                         <div class="col col2-3">
-                            <input type="text" id="card_expiration" name="card_expiration" data-mas="99/9999" placeholder="MM/AAAA">
+                            <input type="text" id="card_expiration" name="card_expiration" data-mask="99/9999" placeholder="MM/AAAA">
                         </div>
                         
                         <div class="col last col1-3">
-                            <input type="text" id="card_cvv" name="card_cvv" placeholder="cvv">
+                            <input type="text" id="card_cvv" name="card_cvv" placeholder="CVV" data-mask="999">
                         </div>
                         <a class="button btn-pink" id="btn-add-cartao">Novo Cartão</a>               
                         <p> Para validar seu cartão será feito uma operação de débito no valor de R$ 0,01 no seu cartão. Após a validação esse valor será estornado.</p>
@@ -712,7 +714,6 @@
     <script type="text/javascript" src="lib/jquery/jquery.countdown360.js" charset="utf-8"></script>    
     <script type="text/javascript" src="js/user.js"></script>
     <script type="text/javascript" src="js/oauth.js"></script>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/vue/0.12.16/vue.min.js"></script>
     <script type="text/javascript" src="js/app.js"></script>
     </body>
 </html>

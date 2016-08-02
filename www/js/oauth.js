@@ -9,7 +9,8 @@ function Oauth(apiurl){
 	this.apiUrlUsuario=this.apiUrl+ '/usuario';
 	this.apiUrlServico=this.apiUrl+ '/servico';
 	this.addCartaoURL =this.apiUrl+ '/addcartao';
-	this.agendamentoURL =this.apiUrl+ '/agendamento';	
+	this.agendamentoURL =this.apiUrl+ '/agendamento';
+	this.agendarURL =this.apiUrl+ '/agendar';
 	this.servicos=null;
 	var access_token;
 	var refresh_token;
@@ -280,7 +281,15 @@ Oauth.prototype ={
 		return this.post(this.addCartaoURL,data);
 	},
 
-	getagendamentoHoras : function(data,manicure){		
-		return this.get(this.agendamentoURL+'?data='+data+'&manicure='+manicure+'&fields=id,hora,manicure');
+	getagendamentoHoras : function(data,manicure_id){		
+		return this.get(this.agendamentoURL+'?data='+data+'&manicure_id='+manicure_id+'&fields=id,data_hora,manicure_id,data_hora_fim');
+	},
+
+	getagendamentoCliente : function(cliente_id){		
+		return this.get(this.agendamentoURL+'?cliente_id='+cliente_id+'&fields=id,data_hora,manicure_id,total,status&sort=data_hora&order=desc');
+	},
+
+	agendar : function(data){
+		return this.post(this.agendarURL,data);
 	}
 }
