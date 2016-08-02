@@ -104,6 +104,7 @@
         }
         
         //backbutton
+       /*
         document.addEventListener("backbutton", function(e){
             console.log('backbutton');
             if($.afui.activeDiv.id=='main'){
@@ -114,14 +115,14 @@
                 navigator.app.backHistory()
             }
         }, false);
-
+*/
         if (window.cordova){
             switch (window.cordova.platformId){
                 case 'browser':
                     facebookConnectPlugin.browserInit('537031369755381','v2.6');  
                     break;
                 case 'ios':
-                    StatusBar.hide();
+                   // StatusBar.hide();
                     break;    
             }
         }
@@ -861,7 +862,9 @@
         $("#confirmacao-resumo").on("panelbeforeload",function(){
             $("#resumo-endereco").html(order.address.formatted_address);
             $("#resumo-data").html(order.data_hora.toLocaleDateString());
-            $("#resumo-hora").html(order.data_hora.getHours()+':'+order.data_hora.getMinutes());
+            $("#resumo-hora").html(order.data_hora.getHours()+':'+('00'+(+order.data_hora.getMinutes())).slice(-2)
+            );
+            
             $("#resumo-cartao").html("Cartão "+user.current.cartao_tipo+" **** **** **** "+user.current.cartao_final);    
             $("#resumo-servicos").html('');
             var total =0;
