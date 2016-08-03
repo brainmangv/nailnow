@@ -123,7 +123,7 @@
                     facebookConnectPlugin.browserInit('537031369755381','v2.6');  
                     break;
                 case 'ios':
-                   // StatusBar.hide();
+                   //StatusBar.hide();
                     break;    
             }
         }
