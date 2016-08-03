@@ -971,6 +971,10 @@
                 });                
             } 
         });
+
+        $(".panel").on('panelload',function(){
+            activeBackButton();
+        })
              
     } //register_event_handlers
 
