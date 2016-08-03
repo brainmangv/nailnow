@@ -979,7 +979,7 @@
     } //register_event_handlers
 
     function activeBackButton(){
-        $('.backButton,[data-back]').on('click',function(){});
+        return $('.backButton,[data-back]').on('click',function(){});
     }
 
     function deviceSim() {
