@@ -1433,9 +1433,10 @@ window.af=window.jq=jQuery;
             });
 
             $(document).on("click", ".backButton, [data-back]", function() {
-                if(that.useInternalRouting)
+                if(that.useInternalRouting){
                     console.log("BackButton Pressed");
                     that.goBack(that);
+                }
             });
             //Check for includes
 

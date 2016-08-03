@@ -104,7 +104,6 @@
         }
         
         //backbutton
-       /*
         document.addEventListener("backbutton", function(e){
             console.log('backbutton');
             if($.afui.activeDiv.id=='main'){
@@ -116,14 +115,14 @@
                 //navigator.app.backHistory()
             }
         }, false);
-        */
+
         if (window.cordova){
             switch (window.cordova.platformId){
                 case 'browser':
                     facebookConnectPlugin.browserInit('537031369755381','v2.6');  
                     break;
                 case 'ios':
-                   //StatusBar.hide();
+                    StatusBar.backgroundColorByHexString("#f8f8f8");
                     break;    
             }
         }
@@ -255,6 +254,7 @@
             //var telephoneNumber = new telephoneNumber();          
         });
 
+        "registrar-tipo"
         //.panel#registrar
         $(".panel#registrar").on("panelload",function(){
             show_header("#af-header-0");
@@ -270,13 +270,13 @@
         });
 
         //editar_conta
-        $(".panel#editar_conta").on("panelload",function(){        
+        $(".panel#editar_conta").on("panelload",function(){
         });
         
         //panel#mapa
         $(".panel#mapa").on("panelload",function(){
-          show_logo_header();
-          //google.maps.event.trigger(map,'resize');
+            show_logo_header();
+            //google.maps.event.trigger(map,'resize');
         });
 
        
@@ -974,6 +974,10 @@
              
     } //register_event_handlers
 
+    function activeBackButton(){
+        $('.backButton,[data-back]').on('click',function(){});
+    }
+
     function deviceSim() {
         window.plugins.sim.getSimInfo(function (result) {
             device.sim=result;
@@ -986,7 +990,7 @@
     }
     
     function update_numero_cartao(placeholder){
-        placeholder.removeClass();
+        placeholder.rem();
         if (user.current.cartao_tipo){
             placeholder.addClass(user.current.cartao_tipo);
             placeholder.html('CARTÃO FINAL ...'+user.current.cartao_final);
