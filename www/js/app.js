@@ -990,7 +990,7 @@
     }
     
     function update_numero_cartao(placeholder){
-        placeholder.rem();
+        placeholder.removeClass();
         if (user.current.cartao_tipo){
             placeholder.addClass(user.current.cartao_tipo);
             placeholder.html('CARTÃO FINAL ...'+user.current.cartao_final);
