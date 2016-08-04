@@ -400,10 +400,10 @@
             change:function(event,ui){                
                 switch(ui.value){
                     case 1:
-                        $("#btn-pedir").text('PEDIR MANICURE AQUI');
+                        $("#btn-pedir span").html('PEDIR MANICURE AQUI <i class="fa fa-chevron-right fa-1x"></i>');
                         break;
                     case 2:
-                        $("#btn-pedir").text('AGENDAR MANICURE AQUI');
+                        $("#btn-pedir span").html('AGENDAR MANICURE AQUI <i class="fa fa-chevron-right fa-1x"></i>');
                         break;
                 }                
             },
@@ -788,14 +788,19 @@
                 $.afui.goBack();
             });
             
-        });        
+        });
+
+        function padzero(num,size){
+            return ('00000'+num).slice(size*-1);
+        };
 
         //selecionar-hora
         $("#selecionar-hora").on("panelbeforeload",function(){
             $("#selecionar-hora ul").html('');
-            var dia=order.data_hora.getFullYear()+'-'+('00'+(order.data_hora.getMonth()+1)).slice(-2)+"-"+order.data_hora.getDate();
+            var dia=order.data_hora.getFullYear()+'-'+padzero(order.data_hora.getMonth()+1,2)+"-"+padzero(order.data_hora.getDate(),2);
             $oauth.getagendamentoHoras(dia,order.manicure_id).done(function(response){
                 var agenda=response._embedded.agendamento;
+                console.log('agenda',agenda);
                 var time = order.data_hora;
                 var hoje = new Date();
                 //se o pedido for hoje começa no horario atual

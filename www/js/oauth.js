@@ -281,7 +281,8 @@ Oauth.prototype ={
 		return this.post(this.addCartaoURL,data);
 	},
 
-	getagendamentoHoras : function(data,manicure_id){		
+	getagendamentoHoras : function(data,manicure_id){	
+		//console.log('agendamento horas',data,manicure_id);	
 		return this.get(this.agendamentoURL+'?data='+data+'&manicure_id='+manicure_id+'&fields=id,data_hora,manicure_id,data_hora_fim');
 	},
 
