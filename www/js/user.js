@@ -113,6 +113,8 @@ function User() {
 			        senderID: "499027471276"
 			    },
 			    ios: {
+					senderID: "499027471276",
+					"gcmSandbox": "true",
 			        alert: "true",
 			        badge: "true",
 			        sound: "true"
