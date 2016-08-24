@@ -51,7 +51,7 @@
     <platform name="ios">
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
-        <preference name="deployment-target" value="4.0" />
+        <preference name="deployment-target" value="7.1" />
         <splash src="images/320x480.png" width="320" height="480"/>
         <icon height="180" src="images/icon-60@3x.png" width="180" />
         <icon height="120" src="images/icon-60@2x.png" width="120" />
