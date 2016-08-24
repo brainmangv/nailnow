@@ -280,7 +280,7 @@ body#afui .splt {
   width: 200px;
 }
 .ios7 .panel {
-  background: white;
+  /*background: white;*/
 }
 .uib_row_1:not(.cright) > .col {
   padding-right: 20px;
@@ -695,13 +695,13 @@ body#afui .splt {
   background-color: #405983 !important;
   border-color: #5172ab !important;
 }
-.btn-black {
-  color: #fff !important;
-  background-color: #000 !important;
-  border-color: #000 !important;
+.ios7 .btn-black {
+  color: #fff;
+  background-color: #000;
+  border-color: #000;
 }
-.btn-black:focus,
-.btn-black:active {
+.ios7 .btn-black:focus,
+.ios7 .btn-black:active {
   background-color: #222 !important;
   color: black !important;
 }
@@ -711,22 +711,25 @@ body#afui .splt {
   font-weight: normal !important;
 }
 
-.btn-pink {
-  color: #fff !important;
-  background-color: #E1014D !important;
-  border-color: #d00147 !important;
+.ios7 .btn-pink {
+  color: #fff;
+  background-color: #E1014D;
+  border-color: #d00147;
 }
 
-.btn-pink.disabled {
+.ios7 .btn-pink.disabled {
   color: #e24c7f;
 }
-
-.btn-pink:focus, 
-.btn-pink:active {
+.ios7 .btn-pink.pressed{
+  background-color: inherit !important;
+}
+/*
+.ios7 .btn-pink:focus, 
+.ios7 .btn-pink:active {
   background-color: #AF013C !important;
   color: #290713 !important;
 }
-
+*/
 .background-line:before,
 .background-line:after {
   border-top: 1px solid #ddd;
@@ -980,8 +983,8 @@ body#afui .splt {
   left: 50%;
   width: 30px;
   height: 40px;
-  margin-top: -82px;
-  margin-left: -16px;
+  margin-top: -86px;
+  margin-left: -15px;
   background: url('../images/pin2.png') no-repeat center center;
   background-size: 30px 40px;
   z-index: 1;
@@ -1121,12 +1124,12 @@ ul.no-chevron li >a:after{
   content:none;
 }
 #map-canvas2{
-  height:160px;
+   height: calc(100vh - 93px);
   -webkit-user-select: none;
 }
-.vcenter-historico{
-  margin-top: 50vh !important;
-  text-align: center;
+.vcenter-historico {
+    margin-top: calc(50vh - 93px) !important;
+    text-align: center;
 }
 .list li:active {
     background: #E1014D;
@@ -1224,7 +1227,6 @@ input[type="url"],
 input[type="tel"],
 input[type="color"],
 .input-group  {
-  background: inherit;
   color: inherit;
   border: none;
   border-radius: 0;
@@ -1288,15 +1290,125 @@ input[type="color"],
     }
 }
 
-#historico ul img{
+ul.agenda img{
   width: 100%;
 }
-
-#historico .col p {
+.agenda .col p {
   font-size: 12px;
   line-height: 11px;
 }
-#historico .col p span{
+.agenda .col p span{
   color: #ce0b0b;
   font-weight: bold;
+}
+
+#btn-ficar-online{
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: block;
+  color: white;
+}
+
+.ios7 .button{
+    background-position: center;
+}
+
+.ios7 .button.btn-loading-bg {
+    background-repeat: no-repeat;
+    background-color: white;
+    background: url('../images/loader.gif') center no-repeat;
+    background-size: 35px;    
+}
+
+.button.btn-loading {
+  -webkit-animation: btn-loadingAnimation 200ms forwards;
+  animation: btn-loadingAnimation 200ms forwards;
+  color: transparent !important;
+}
+@keyframes btn-loadingAnimation {
+  0% {
+    width: 100%;    
+    border-radius: 5px;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    display: block !important;    
+  }
+  100% {
+    width: 35px;
+    height: 35px;
+    border-radius: 100%;
+    background: white !important;
+    color: transparent !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    display: block !important;
+  }
+}
+
+.btn-loading.animation-reverse {
+  -webkit-animation: btn-loadingAnimationReverse 200ms forwards;
+  animation: btn-loadingAnimationReverse 200ms forwards;
+}
+
+@keyframes btn-loadingAnimationReverse{
+100% {
+    width: 100%;    
+    border-radius: 5px;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    display: block !important;
+    background: white !important;
+  }
+0% {
+    width: 76px;
+    border-radius: 100%;
+    background: white !important;
+    color: transparent !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    display: block !important;
+  }
+  
+}
+
+.ios7 .view footer{
+    background:black;
+}
+
+.ios7 footer .button {
+    border: 0px;
+    margin-top: 0px;
+    font-size: 12px;
+    color:white;
+    font-weight: normal;
+    line-height: 19px;
+}
+footer .button i{
+    display:block;    
+}
+#af-header-2 a,#af-header-2 h1 {
+    color: white;
+}
+#af-header-2{
+  background:#E1014D;
+}
+#af-header-2 .grid.grid-pad {
+    padding: 5px;
+}
+.border-bottom{
+    border-bottom: 1px solid #ccc;
+}
+.list-header{
+  background: black;
+  color: white;
+  font-weight: bold;
+  margin-left: -10px;
+  margin-right: -10px;
+  padding: 0px 12px;
+}
+.input-group{
+  border-radius: 5px;
+}
+#main,#sidemenu .panel{
+  background: white;
 }

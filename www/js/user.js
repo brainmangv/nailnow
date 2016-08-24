@@ -157,7 +157,8 @@ function User() {
 
 			push.on('notification', function(data) {
 			    console.log('push notificaton',data);
-			    alert(data);
+				if (data.additionalData.tipo =='agendamento_agora') manicure_cronometro();
+			    //alert(data);
 				// alert($rootScope.badge);
 				/*
 				$rootScope.badge += 1;
@@ -558,5 +559,5 @@ function User() {
 			id: id
 		};
   		return $oauth.addCartao(data);
-  	}
+  	}	
 };

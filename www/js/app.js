@@ -1,27 +1,3 @@
-/*
- * Please see the included README.md file for license terms and conditions.
- */
-
-
-// This file is a suggested starting place for your code.
-// It is completely optional and not required.
-// Note the reference that includes it in the index.html file.
-
-
-/*jslint browser:true, devel:true, white:true, vars:true */
-/*global $:false, intel:false app:false, dev:false, cordova:false */
-
-
-// For improved debugging and maintenance of your app, it is highly
-// recommended that you separate your JavaScript from your HTML files.
-// Use the addEventListener() method to associate events with DOM elements.
-
-// For example:
-
-// var el ;
-// el = document.getElementById("id_myButton") ;
-// el.addEventListener("click", myEventHandler, false) ;
-
 /*jshint browser:true */
 /*global $ */
 //(function()
@@ -30,15 +6,19 @@
     /*
      hook up event handlers 
     */
-    var map = null;
-    var map_confirmacao = null;
-    var oldLatLng = '';
-    var myLatLng ='';
-    var geocoder;
-    var addressLocation =null;
+    //var map = null;
+    var map2 = null;
+    //var myLatLng ='';
+    //var geocoder;
+    //var addressLocation =null;
     var tipo_usuario='';
     var user = new User();
-    var order = {};
+    var order = {};    
+    var map_cliente = new Map_cliente();
+    var map_manicure = new Map_manicure();
+    var current_agendamento_id;
+    //var myMarker;
+    //var myMarker2;
     var $oauth = new Oauth('http://api.nailnow.co');
     var USER_IMAGE_PATH= 'http://api.nailnow.co/images/users/';
     var countdown =  $("#countdown").countdown360({
@@ -81,19 +61,22 @@
 
         return this.optional(element) || respost;
     }, "Por favor, forneça um numero válido.");
-    document.addEventListener("DOMContentLoaded",function(){
-        console.log('Domloaded');
-    },false);
+    document.addEventListener("app.Ready", init, false);
     document.addEventListener("app.Ready", register_event_handlers, false);
-    document.addEventListener("app.Ready", initMap, false);
-    document.addEventListener("app.Ready", redirect_if_logged, false);
+    //document.addEventListener("app.Ready", initMap, false);
     //document.addEventListener("app.Ready", deviceSim, false);
     //document.addEventListener("app.Ready", geolocationAutoUpdate, false);
     //document.addEventListener("app.Ready", setupPush, false);
 
+    function init(){                
+        
+        redirect_if_logged();
+    }
+
     function register_event_handlers(){
         $.afui.loadDefaultHash=false;        
         window.BOOTSTRAP_OK = true;
+        //if (window.cordova && cordova.plugins.backgroundMode) cordova.plugins.backgroundMode.enable();
         console.log('appready');
         if (window.cordova){        
             cordova.getAppVersion().done(
@@ -198,7 +181,7 @@
                                 .then(function(){
                                     if (tipo_usuario=='M')                         
                                         $.afui.loadContent("#manicure",false,false,"slide")
-                                    else show_map();
+                                    else map_cliente.show_map();
                                 });
                         },
                         function(error) {
@@ -237,7 +220,7 @@
         //btn-registrar-cliente
         $("#btn-registrar-cliente").on("click",function(){
             tipo_usuario='C';
-            console.log('btn-rregistrar');
+            console.log('btn-registrar');
             $.afui.loadContent("#registrar",false,false,"slide");
         });
 
@@ -289,12 +272,13 @@
 
         $("#btn-pedir").on("click",function(){
             order={};
-            order.address=addressLocation;
+            order.address=map_cliente.addressLocation;
             switch ($("#slider").slider("value")){
             case 1:
                 console.log('btn-pedir 1');
                 order.tipo="now";
-                load_confirmacao_agora();
+                load_confirmacao_agendamento();
+                //load_confirmacao_agora();
             break;
             case 2:
                 order.tipo="agendamento";
@@ -302,95 +286,7 @@
                 load_confirmacao_agendamento();                
             break;
         }
-        });
-
-        function static_map(latlng,width,height,zoom){
-            var google_img="https://maps.googleapis.com/maps/api/staticmap?zoom="+zoom+"&center="+     
-            latlng.lat() +","+
-            latlng.lng() + '&size='+width+'x'+height+'&key=AIzaSyCw-1K3hDJDFhDnujklziKhIVNbLFdjIfk';
-            return google_img;
-        }
-
-        function load_confirmacao_agendamento(){
-            hide_logo_header();
-            $("#static-map-agendamento").attr("src",static_map(myLatLng,$(document).width(),160,18));
-            $.afui.loadContent("#confirmacao-agendamento");                        
-            $('#conf_data').mobiscroll().date({
-                theme: 'android',     // Specify theme like: theme: 'ios' or omit setting to use default 
-                mode: 'scroller',       // Specify scroller mode like: mode: 'mixed' or omit setting to use default 
-                display: 'bottom', // Specify display mode like: display: 'bottom' or omit setting to use default 
-                lang: 'pt-BR',        // Specify language like: lang: 'pl' or omit setting to use default 
-                minDate: new Date(2016,3,10,9,22),  // More info about minDate: http://docs.mobiscroll.com/2-14-0/datetime#!opt-minDate
-                maxDate: new Date(2016,5,30,15,44),
-            });
-
-            $('#conf_hora').on('click',function(){
-                console.log('#conf_hora');
-                $.afui.loadContent("#agenda-horarios",false,false,"up-reveal");
-            });
-
-            /*$('#conf_hora').mobiscroll().time({
-                theme: 'android',     // Specify theme like: theme: 'ios' or omit setting to use default 
-                mode: 'scroller',       // Specify scroller mode like: mode: 'mixed' or omit setting to use default 
-                display: 'bottom', // Specify display mode like: display: 'bottom' or omit setting to use default 
-                lang: 'pt-BR'        // Specify language like: lang: 'pl' or omit setting to use default 
-            });*/
-
-            console.log(addressLocation);
-            var endereco=addressLocation.address_components.find(function(p){return p.types[0]==='route'});
-            var numero=addressLocation.address_components.find(function(p){return p.types[0]==='street_number'});
-            var bairro=addressLocation.address_components.find(function(p){return p.types.find(function(p){return p=='sublocality'})});
-            var cidade=addressLocation.address_components.find(function(p){return p.types.find(function(p){return p=='locality'})});
-            var uf=addressLocation.address_components.find(function(p){return p.types[0]==='administrative_area_level_1'});
-            var cep=addressLocation.address_components.find(function(p){return p.types[0]==='postal_code'});
-            order.endereco = endereco ? endereco.long_name:'';
-            order.numero = numero ? numero.long_name.split('-')[0]:'';
-            order.bairro = bairro ? bairro.long_name:'';
-            order.cidade= cidade ? cidade.long_name:'';
-            order.uf= uf ? uf.short_name:'';
-            order.cep= cep ? cep.long_name:'';
-            order.telefone= user.current.telefone ? user.current.telefone.replace('+55',''):'';
-            //.long_name.split('-')[0]
-            $("#conf_endereco").val(order.endereco);
-            $("#conf_numero").val(order.numero);
-            $("#conf_bairro").val(order.bairro);
-            $("#conf_cidade").val(order.cidade);
-            $("#conf_uf").val(order.uf);
-            $("#conf_cep").val(order.cep);
-            $("#conf_telefone").val(order.telefone);            
-        };
-
-        function load_confirmacao_agora(){
-            hide_logo_header();
-            $("#static-map-confirmacao").attr("src",static_map(myLatLng,$(document).width(),$(document).height(),map.getZoom()));
-            $.afui.loadContent("#confirmacao-agora");                                    
-            $('#conf_data').mobiscroll().date({
-                theme: 'android',     // Specify theme like: theme: 'ios' or omit setting to use default 
-                mode: 'scroller',       // Specify scroller mode like: mode: 'mixed' or omit setting to use default 
-                display: 'bottom', // Specify display mode like: display: 'bottom' or omit setting to use default 
-                lang: 'pt-BR',        // Specify language like: lang: 'pl' or omit setting to use default 
-                minDate: new Date(2016,3,10,9,22),  // More info about minDate: http://docs.mobiscroll.com/2-14-0/datetime#!opt-minDate
-                maxDate: new Date(2016,5,30,15,44),
-            });
-
-            /*$('#conf_hora').on('click',function(){
-                console.log('#conf_hora');
-                $.afui.loadContent("#agenda-horarios",false,false,"up-reveal");
-            });*/
-
-            /*$('#conf_hora').mobiscroll().time({
-                theme: 'android',     // Specify theme like: theme: 'ios' or omit setting to use default 
-                mode: 'scroller',       // Specify scroller mode like: mode: 'mixed' or omit setting to use default 
-                display: 'bottom', // Specify display mode like: display: 'bottom' or omit setting to use default 
-                lang: 'pt-BR'        // Specify language like: lang: 'pl' or omit setting to use default 
-            });*/
-
-            console.log(addressLocation);
-            $("#conf_endereco").val(addressLocation.address_components.find(function(p){return p.types[0]==='route'}).long_name);
-            $("#conf_numero").val(addressLocation.address_components.find(function(p){return p.types[0]==='street_number'}).long_name);
-            $("#conf_cidade").val(addressLocation.address_components.find(function(p){return p.types[0]==='locality'}).long_name);
-            $("#conf_bairro").val(addressLocation.address_components.find(function(p){return p.types.find(function(t){return t==='sublocality_level_1'})}).long_name);
-        };            
+        });      
     
         //slider
         $("#slider").slider({
@@ -409,7 +305,7 @@
             },
 
             stop: function( event, ui ) {
-                google.maps.event.trigger(map,'resize');
+                google.maps.event.trigger(map_cliente.map,'resize');
             }
            // change: showValue
         });
@@ -434,7 +330,7 @@
             },
 
             stop: function( event, ui ) {
-                google.maps.event.trigger(map,'resize');
+                google.maps.event.trigger(map_cliente.map,'resize');
             }
            // change: showValue
         });
@@ -445,7 +341,7 @@
             user.loginFB()
             .done(function(){                
                 update_drawer();
-                show_map();                
+                map_cliente.show_map();                
             });
         });
 
@@ -478,13 +374,7 @@
             })
         });
 
-        $("#conf_pgto").on("click",function(){
-            var intObj = {
-              template: 3, 
-              parent: '#add-cartao' // this option will insert bar HTML into this parent Element 
-            };
-            var indeterminateProgress = new Mprogress(intObj);
-            indeterminateProgress.start();
+        $("#conf_pgto").on("click",function(){           
             $.afui.loadContent("#add-cartao", false, false, 'slide');
         });
 
@@ -541,7 +431,7 @@
 
         //historico
         $("#historico").on("panelload",function(){
-            $("#historico").html('<ul class="list"></ul>');
+            $("#historico").html('<ul class="list agenda"></ul>');
             $oauth.getagendamentoCliente(user.current.id)
                 .done(function(r){
                     var mes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
@@ -551,14 +441,21 @@
                         var d=new Date(i.data_hora);                      
                         $("#historico ul.list").append('<li>'+
                             '<a data-id="'+i.id+'"> <div class="urow">'+
-                            '<div class="col col1-4"><img src="images/no-user-image.png" id="userimg"></div>'+
+                            '<div class="col col1-4"><img src="'+ (i.manicure_image ? i.manicure_image : 'images/no-user-image.png"') +
+                            ' id="userimg"></div>'+
                             '<div class="col col3-4 last">'+
-                                '<p>'+i.nome+'</p>'+
+                                '<p>'+i.manicure_nome+'</p>'+
                                     '<p>Agendado - '+ diaDaSemana[d.getDay()]+' ' +d.getDate()+'/'+
                                     mes[d.getMonth()] + ' '+i.data_hora.substr(-5)+'</p>'+
                                     '<p>R$ '+i.total+' <span>'+i.status+'</span> </p>'+
                             '</div></div></a></li>');                    
                     })
+
+                    //list.agenda a
+                    $("#historico ul.list.agenda a").on("click",function(){
+                        current_agendamento_id = $(this).data("id");
+                        $.afui.loadContent("#historico-detail");
+                    });
                     
                 })
                 .fail(function(e){
@@ -608,13 +505,16 @@
                     }
                 }]
               );*/
-            window.plugins.socialsharing.share('Veja esse novo app para agendamentos de manicure.');
+              if (window.plugins && window.plugins.socialsharing)
+                window.plugins.socialsharing.share('Veja esse novo app para agendamentos de manicure.');
         });
 
         //btn-termos-uso
         $(".btn-termos-uso").on("click",function(){
             //hide_logo_header();            
-            var openWindow = cordova.InAppBrowser.open('http://nailnow.co/termos.html');
+            if (window.cordova){
+                var openWindow = cordova.InAppBrowser.open('http://nailnow.co/termos.html');
+            }
             //$.afui.drawer.hide('#sidemenu');
             //$.afui.loadContent("#termos-uso",false,false,"slide");    
         });
@@ -625,14 +525,95 @@
             //alert('saindo');            
             $.afui.loadContent("#main",false,false,"slide");    
             $.afui.drawer.hide("#sidemenu"); 
-            window.plugins.digits.logout();
+            if (window.plugins && window.plugins.digits)
+                window.plugins.digits.logout();
         });
 
         //btn_manicure_calendar
         $("#btn-manicure-calendar").on("click",function(){
             hide_logo_header_manicure();
-            $.afui.loadContent("#manicure-calendar",false,false,"slide");    
-            
+            $.afui.loadContent("#manicure-calendar",false,true,"up");
+        });
+      
+        //manicure_calendar panelload
+        $("#manicure-calendar").on("panelbeforeload",function(){
+            $("#manicure-calendar").html('<ul class="list agenda"></ul>');
+            $oauth.getagendamentoManicure(user.current.id)
+                .done(function(r){
+                    var mes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                                'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+                    var diaDaSemana=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sabádo'];                    
+                    r._embedded.agendamento.forEach(function(i){
+                        var d=new Date(i.data_hora);                      
+                        $("#manicure-calendar ul.list").append('<li>'+
+                            '<a data-id="'+i.id+'"> <div class="urow">'+
+                            '<div class="col col1-4"><img src='+ (i.cliente_image ? i.cliente_image : '"images/no-user-image.png"') +' id="userimg"></div>'+
+                            '<div class="col col3-4 last">'+
+                                '<p>'+i.cliente_nome+'</p>'+
+                                    '<p>'+ diaDaSemana[d.getDay()]+' ' +d.getDate()+'/'+
+                                    mes[d.getMonth()] + ' '+i.data_hora.substr(-8,5)+'</p>'+
+                                    '<p>R$ '+i.total+' <span>'+i.status+'</span> </p>'+
+                            '</div></div></a></li>');                    
+                    })
+                    
+                    //list.agenda a
+                    $("ul.list.agenda a").on("click",function(){
+                        current_agendamento_id = $(this).data("id");
+                        $.afui.loadContent("#manicure-calendar-detail");
+                    });
+                    
+                })
+                .fail(function(e){
+                    $("#historico").html('<div class="grid grid-pad urow uib_row_10 row-height-10" data-uib="layout/row" data-ver="0">'+
+                        '<div class="col uib_col_17 col-0_12-12" data-uib="layout/col" data-ver="0">'+
+                        '<div class="vcenter-historico">Histórico Vazio.<br>Seus atendimentos serão listados aqui.</div>'+
+                        '</div>'+
+                    '</div>');
+                })
+        });
+
+        //manicure-calendar-detail panelbeforeload
+        $("#manicure-calendar-detail").on("panelbeforeload",function(){
+            console.log('manicure calendar detail');            
+        	$("#manicure-calendar-detail").html('');
+            $oauth.getagendamentoId(current_agendamento_id)
+                .done(function(r){                 
+                    var d=new Date(r.data_hora);
+                    var mes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                                'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+                    var diaDaSemana=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sabádo'];  
+                  $("#manicure-calendar-detail").html(                    
+                    '<p class="formGroupHead grid-pad">Detalhes do Pedido</p>'+
+                    '<ul class="list inset">'+
+                    '<li class="urow vertical-col">'+
+                        '<div class="col"><p class="border-bottom">'+r.cliente_nome+'</p></div>'+
+                        '<div class="col col2"><p class=" border-bottom">'+ diaDaSemana[d.getDay()]+' ' +d.getDate()+'/'+
+                                    mes[d.getMonth()] +'</p></div>'+
+                        '<div class="col col2 last"><p class=" border-bottom">'+r.data_hora.substr(-8,5)+'</p></div>'+
+                        '<div class="col col3-4"><p class="border-bottom">'+r.endereco+'</p></div>'+
+                        '<div class="col col1-4 last"><p class="border-bottom">'+r.numero+'</p></div>'+
+                        '<div class="col col2"><p class="border-bottom">'+r.cidade+'</p></div>'+
+                        '<div class="col col2 last"><p class="border-bottom">'+r.uf+'</p></div>'+
+                        '<div class="col"><p class="border-bottom icon phone"><a href="tel:'+r.telefone+'" >'+r.telefone+'</a></p></div>'+
+                    '</li>'+
+                    '</ul>'+
+                    '<p class="grid-pad formGroupHead">Servicos</p>'+
+                    '<ul class="list inset">'+
+                        '<li class="urow">'+
+                            '<div class="list-header urow">'+
+                                '<div class="col col3-4"><p>&nbsp; Item</p></div>'+
+                                '<div class="col col1-4 vertical-col center"><p>QTD</p></div>'+
+                            '</div>'+
+                            '<div class="col col3-4 "><p class="border-bottom">Descricao do item</p></div>'+
+                            '<div class="col col1-4 last vertical-col center"><p class="border-bottom">1</p></div>'+
+                            '<div class="col col3-4 "><p>Descricao do item</p></div>'+
+                            '<div class="col col1-4 last vertical-col center"><p class="border-bottom">1</p></div>'+
+                            '<div class="col col3-4 "><p class="border-bottom">Descricao do item</p></div>'+
+                            '<div class="col col1-4 last vertical-col center"><p class="border-bottom">1</p></div>'+
+                        '</li>'+
+                    '</ul>'
+                  );
+                });		
         });
 
         //btn_menu_manicure
@@ -642,6 +623,7 @@
 
         //.panel#manicure
         $(".panel#manicure").on("panelload",function(){
+          //if (cordova.plugins.backgroundMode)
           show_logo_header_manicure();
         });
         
@@ -663,6 +645,7 @@
        
         //btn-confirmacao-agendamento
         $("#btn-confirmacao-agendamento").on("click",function(){            
+            
             if($("#frm-confirmacao-agendamento").valid()){ 
                 order.endereco = $("#conf_endereco").val();
                 order.numero =$("#conf_numero").val();
@@ -672,6 +655,7 @@
                 order.cep= $("#conf_cep").val();
                 order.telefone= $("#conf_telefone").val();
                 order.cliente_id= user.current.id;
+                order.vindi_id=user.current.vindi_id;
                 $.afui.loadContent("#confirmacao-servicos",false,false,"slide");
             } 
         });       
@@ -710,7 +694,7 @@
             $('#lista-servicos input[type=checkbox]:checked').each(
                 function(id) {
                     order.servicos.push({
-                        "id":id,
+                        "id":$(this).val(),
                         "qtd":$('#srv_qtd_'+$(this).attr('data-row')).val(),
                         "valor":$(this).attr('data-valor'),
                         "duracao":$(this).attr('data-duracao'),
@@ -730,7 +714,7 @@
                 r._embedded.usuario.
                 forEach(function(e,i){
                     var imgSrc=e.imagem? e.imagem:'images/girl-avatar.png';
-                    var pontuacao=e.manicure_pontuacao/5*100;
+                    var pontuacao=e.pontuacao/5*100;
                     $("#lista-manicures").append(
                     '<li class="grid">'+
                         '<a class="btn-lista-manicures" data-id='+e.id+'>'+
@@ -796,7 +780,7 @@
 
         //selecionar-hora
         $("#selecionar-hora").on("panelbeforeload",function(){
-            $("#selecionar-hora ul").html('');
+            $("#selecionar-hora").html('<ul class="list inset"></ul>');
             var dia=order.data_hora.getFullYear()+'-'+padzero(order.data_hora.getMonth()+1,2)+"-"+padzero(order.data_hora.getDate(),2);
             $oauth.getagendamentoHoras(dia,order.manicure_id).done(function(response){
                 var agenda=response._embedded.agendamento;
@@ -820,7 +804,7 @@
                 }
                 
                 if (time.getHours()>17){
-                    $("#selecionar-hora ul").html('<p style="text-align: center">Não existe horário disponivel para essa data.</p>');
+                    $("#selecionar-hora").html('<div class="vcenter-historico"><p>Não existe horário disponivel para essa data.</p></div>');
                 }
 
                 while(time.getHours()<=17){
@@ -847,7 +831,7 @@
                         var inicio= new Date(e.data_hora);
                         var fim  = new Date(e.data_hora_fim);                        
                         if (time >=inicio && time< fim){
-                            console.log('nao',time,e);
+                            //console.log('nao',time,e);
                             permite=false;
                         }
                     });
@@ -901,13 +885,14 @@
                         title:"Sucesso",
                         message:"Seu agendamento foi confirmado, breve a profissional entrará em contato com você.",
                         cancelText:"Ok",
-                        cancelCallback: function(){$.afui.loadContent("#mapa",false,false,"slide"); },
+                        cancelCallback: function(){$.afui.clearHistory();$.afui.loadContent("#mapa",false,false,"slide"); },
                         cancelOnly:true
                     });
                 
             })
             .fail(function(e){
-                $.afui.popup({title:'Falha',message:'Ocorreu uma falha no agendamento',cancelOnly:true,cancelText:'OK'})
+                var message =typeof e.responseJSON !== 'undefined' ? e.responseJSON.detail : 'Erro no processamento';
+                $.afui.popup({title:'Falha',message: message,cancelOnly:true,cancelText:'OK'})
             });
         });
         
@@ -916,15 +901,17 @@
             update_numero_cartao($(".cartao-credito p"));
         });
 
+        //confirmacao-agendamento
         $("#confirmacao-agendamento .cartao-credito p").on("click",function(){
             $.afui.loadContent("#add-cartao",false,false,"slide"); 
         });
              
-
+        //btn-meios-pgto-add
         $("#btn-meios-pgto-add").on("click",function(){
             $.afui.loadContent("#add-cartao",false,false,"slide"); 
         });
-
+        
+        //add-cartao
         $("#add-cartao").on("panelbeforeload",function(){
             $("#card_expiration").mask("99/9999");
             $("#holder_name").val('');
@@ -965,11 +952,13 @@
 
                 user.addCartao(holder_name,card_expiration,card_number,card_cvv,payment_method_code,payment_company_code,user.current.vindi_id,user.current.id)
                 .done(function(r){
-                    user.current.cartao_tipo= r.payment_profile.payment_company.code;
-                    user.current.cartao_final= r.payment_profile.card_number_last_four;                    
-                    
-                    update_numero_cartao($(".cartao-credito p"));                    
-                    $.afui.popup({title:'Sucesso',message:'cartão adicionado com sucesso',cancelOnly:true,cancelText:'OK'})
+                    user.setCurrentUser().done(function(){
+                        //user.current.cartao_tipo= r.payment_profile.payment_company.code;
+                        //user.current.cartao_final= r.payment_profile.card_number_last_four;                    
+                        
+                        update_numero_cartao($(".cartao-credito p"));                    
+                        $.afui.popup({title:'Sucesso',message:'cartão adicionado com sucesso',cancelOnly:true,cancelText:'OK'})
+                    });
                 })
                 .fail(function(e){
                     $.afui.popup({title:'Erro de Validação',message:'Erro ao cadastrar o cartão, verifique os dados informados',cancelOnly:true,cancelText:'OK'})
@@ -977,12 +966,150 @@
             } 
         });
 
+        //on panelload
         $(".panel").on('panelload',function(){
             activeBackButton();
         })
+
+        //btn-ficar-online    
+        $("#btn-ficar-online").on('click',function(){
+            btn_loading();                
+
+            function btn_loading(){
+                $("#btn-ficar-online").animation().run('btn-loading').keep().end(function(){
+                    $("#btn-ficar-online").addClass('btn-loading-bg');
+                    if ($('#btn-ficar-online').hasClass('btn-pink')){
+                        ficar_online();    
+                    }else{
+                        ficar_offline();
+                    }
+                });
+            }
+
+            function btn_loading_reverse(f){
+                $("#btn-ficar-online").removeClass('btn-loading-bg');
+                $("#btn-ficar-online").animation().run('btn-loading').reverse().end(f);
+            }
+
+            function ficar_offline(){
+                $oauth.updateStatus(user.current.id,'offline')
+                    .done(function(){
+                        btn_loading_reverse(function(){
+                            $("#btn-ficar-online").removeClass('btn-black');
+                            $("#btn-ficar-online").addClass('btn-pink');
+                            $("#btn-ficar-online").html('FICAR ONLINE');
+                            $.afui.toast({message:'Voce esta offline',position:'tc'});
+                            map_manicure.stop_pbar();
+                        });
+                    }); 
+            }
+
+            function ficar_online(){
+                $oauth.updateStatus(user.current.id,'online')
+                    .done(function(){
+                        btn_loading_reverse(function(){
+                            $("#btn-ficar-online").removeClass('btn-pink');
+                            $("#btn-ficar-online").addClass('btn-black');
+                            $("#btn-ficar-online").html('FICAR OFFLINE');
+                            $.afui.toast({message:'Voce esta online',position:'tc'});
+                            map_manicure.start_pbar();
+                        });
+                    });
+            }
+        });
              
     } //register_event_handlers
 
+    function static_map(latlng,width,height,zoom){
+        var google_img="https://maps.googleapis.com/maps/api/staticmap?"+ 'size='+width+'x'+height+
+        '&markers=icon:https://nailnow.co/img/pin2.png%7C'+latlng.lat() +","+latlng.lng()+
+        '&key=AIzaSyCw-1K3hDJDFhDnujklziKhIVNbLFdjIfk';
+        return google_img;
+    }
+
+    function load_confirmacao_agendamento(){
+        var addressLocation=map_cliente.addressLocation;
+        hide_logo_header();
+        $("#static-map-agendamento").attr("src",static_map(map_cliente.myLatLng,$(document).width(),160,18));
+        $.afui.loadContent("#confirmacao-agendamento");                        
+        $('#conf_data').mobiscroll().date({
+            theme: 'android',     // Specify theme like: theme: 'ios' or omit setting to use default 
+            mode: 'scroller',       // Specify scroller mode like: mode: 'mixed' or omit setting to use default 
+            display: 'bottom', // Specify display mode like: display: 'bottom' or omit setting to use default 
+            lang: 'pt-BR',        // Specify language like: lang: 'pl' or omit setting to use default 
+            minDate: new Date(2016,3,10,9,22),  // More info about minDate: http://docs.mobiscroll.com/2-14-0/datetime#!opt-minDate
+            maxDate: new Date(2016,5,30,15,44),
+        });
+
+        $('#conf_hora').on('click',function(){
+            console.log('#conf_hora');
+            $.afui.loadContent("#agenda-horarios",false,false,"up-reveal");
+        });
+
+        /*$('#conf_hora').mobiscroll().time({
+            theme: 'android',     // Specify theme like: theme: 'ios' or omit setting to use default 
+            mode: 'scroller',       // Specify scroller mode like: mode: 'mixed' or omit setting to use default 
+            display: 'bottom', // Specify display mode like: display: 'bottom' or omit setting to use default 
+            lang: 'pt-BR'        // Specify language like: lang: 'pl' or omit setting to use default 
+        });*/
+
+        console.log(addressLocation);
+        var endereco=addressLocation.address_components.find(function(p){return p.types[0]==='route'});
+        var numero=addressLocation.address_components.find(function(p){return p.types[0]==='street_number'});
+        var bairro=addressLocation.address_components.find(function(p){return p.types.find(function(p){return p=='sublocality'})});
+        var cidade=addressLocation.address_components.find(function(p){return p.types.find(function(p){return p=='locality'})});
+        var uf=addressLocation.address_components.find(function(p){return p.types[0]==='administrative_area_level_1'});
+        var cep=addressLocation.address_components.find(function(p){return p.types[0]==='postal_code'});
+        order.endereco = endereco ? endereco.long_name:'';
+        order.numero = numero ? numero.long_name.split('-')[0]:'';
+        order.bairro = bairro ? bairro.long_name:'';
+        order.cidade= cidade ? cidade.long_name:'';
+        order.uf= uf ? uf.short_name:'';
+        order.cep= cep ? cep.long_name:'';
+        order.telefone= user.current.telefone ? user.current.telefone.replace('+55',''):'';
+        //.long_name.split('-')[0]
+        $("#conf_endereco").val(order.endereco);
+        $("#conf_numero").val(order.numero);
+        $("#conf_bairro").val(order.bairro);
+        $("#conf_cidade").val(order.cidade);
+        $("#conf_uf").val(order.uf);
+        $("#conf_cep").val(order.cep);
+        $("#conf_telefone").val(order.telefone);            
+    };
+
+    function load_confirmacao_agora(){
+        var addressLocation=map_cliente.addressLocation;
+        hide_logo_header();
+        $("#static-map-confirmacao").attr("src",static_map(map_cliente.myLatLng,$(document).width(),$(document).height(),map_cliente.map.getZoom()));
+        $.afui.loadContent("#confirmacao-agora");                                    
+        $('#conf_data').mobiscroll().date({
+            theme: 'android',     // Specify theme like: theme: 'ios' or omit setting to use default 
+            mode: 'scroller',       // Specify scroller mode like: mode: 'mixed' or omit setting to use default 
+            display: 'bottom', // Specify display mode like: display: 'bottom' or omit setting to use default 
+            lang: 'pt-BR',        // Specify language like: lang: 'pl' or omit setting to use default 
+            minDate: new Date(2016,3,10,9,22),  // More info about minDate: http://docs.mobiscroll.com/2-14-0/datetime#!opt-minDate
+            maxDate: new Date(2016,5,30,15,44),
+        });
+
+        /*$('#conf_hora').on('click',function(){
+            console.log('#conf_hora');
+            $.afui.loadContent("#agenda-horarios",false,false,"up-reveal");
+        });*/
+
+        /*$('#conf_hora').mobiscroll().time({
+            theme: 'android',     // Specify theme like: theme: 'ios' or omit setting to use default 
+            mode: 'scroller',       // Specify scroller mode like: mode: 'mixed' or omit setting to use default 
+            display: 'bottom', // Specify display mode like: display: 'bottom' or omit setting to use default 
+            lang: 'pt-BR'        // Specify language like: lang: 'pl' or omit setting to use default 
+        });*/
+
+        console.log(addressLocation);
+        $("#conf_endereco").val(addressLocation.address_components.find(function(p){return p.types[0]==='route'}).long_name);
+        $("#conf_numero").val(addressLocation.address_components.find(function(p){return p.types[0]==='street_number'}).long_name);
+        $("#conf_cidade").val(addressLocation.address_components.find(function(p){return p.types[0]==='locality'}).long_name);
+        $("#conf_bairro").val(addressLocation.address_components.find(function(p){return p.types.find(function(t){return t==='sublocality_level_1'})}).long_name);
+    };      
+    
     function activeBackButton(){
         return $('.backButton,[data-back]').on('click',function(){});
     }
@@ -1008,7 +1135,7 @@
         return false;
     }
 
-    function bandeira_cartao(num) {        
+    function bandeira_cartao(num) {
         var visa= /^4[0-9]{12}(?:[0-9]{3})$/;        
         var mastercard= /^5[1-5][0-9]{14}$/;
         var amex= /^3[47][0-9]{13}$/;
@@ -1028,14 +1155,22 @@
 
     function redirect_if_logged(){
         if(!$oauth.isExpired()){
-            if(user.getCurrentUser()){                
+            if(user.getCurrentUser()){
+                user.registerPushNotification();                
                 update_drawer();
                 switch(user.current.tipo){
                     case 'C':
-                        show_map();
+                        tipo_usuario='C';                        
+                        map_cliente.initMap();
+                        //map_cliente.show_map();
+                        $.afui.loadContent("#mapa",false,false,"slide");
+                        map_cliente.centerCurrentLocation();
                         break;
                     case 'M':
+                        tipo_usuario='M';
+                        map_manicure.initMap();                        
                         $.afui.loadContent("#manicure",false,false,"slide");
+                        map_manicure.centerCurrentLocation();
                         break;               
                 }
             }
@@ -1048,8 +1183,8 @@
         var idAssistindo = '';
         if(id){
           idAssistindo = id;
-        }else if(GLOBAL.watchID){
-          idAssistindo = GLOBAL.watchID;
+        }else if(window.watchID){
+          idAssistindo = window.watchID;
         }
         if(idAssistindo != ''){
           navigator.geolocation.clearWatch(idAssistindo);
@@ -1065,34 +1200,34 @@
 
         var posOptions = {enableHighAccuracy: (accuracy===false?false:true)};
 
-        if(!GLOBAL.coordenadas && timeout > 0){
+        if(!window.coordenadas && timeout > 0){
           timeout = (timeout>40000?timeout:40000);
         }
         if(timeout && timeout > 0){
           posOptions.timeout = timeout;
         }
 
-        GLOBAL.watchID = navigator.geolocation.watchPosition(
+        window.watchID = navigator.geolocation.watchPosition(
             function(position){       
                 var lat  = position.coords.latitude;
                 var lng = position.coords.longitude;
 
                 var retOri = {lat:lat,lng:lng};
-                  lat = number_format(lat,4)*1;
-                  lng = number_format(lng,4)*1;
+                  //lat = number_format(lat,4)*1;
+                  //lng = number_format(lng,4)*1;
 
                 var ret = {lat:lat,lng:lng};
 
-                if(GLOBAL.coordenadas && GLOBAL.coordenadas.lat && GLOBAL.coordenadas.lng){
-                  if( GLOBAL.coordenadas.lat != lat ||  GLOBAL.coordenadas.lng != lng){
-                    GLOBAL.coordenadas = ret;
+                if(window.coordenadas && window.coordenadas.lat && window.coordenadas.lng){
+                  if( window.coordenadas.lat != lat ||  window.coordenadas.lng != lng){
+                    window.coordenadas = ret;
                     console.log("pegou posição - ",position);
                     success(retOri);
                   }else{
-                    //console.log('não alterou a posição');
+                    console.log('não alterou a posição');
                   }
                 }else{
-                  GLOBAL.coordenadas = ret;
+                  window.coordenadas = ret;
                   success(retOri);
                 }
 
@@ -1163,7 +1298,7 @@
             console.log(e.message);
         }
     }
-
+    /*
     function hide_map_panel(){
         $(".map-float-box").addClass('hide-float-box');
         $("#map-canvas").addClass('full');
@@ -1173,15 +1308,14 @@
         $(".map-float-box").removeClass('hide-float-box');
         $("#map-canvas").removeClass('full');        
     }
-
+     */
     function hide_logo_header(){
         $("#logo-header").hide();
         $("#btn_menu").hide();
     }
 
     function hide_logo_header_manicure(){
-        $("#logo-header-manicure").hide();
-        $("#btn-menu-manicure").hide();
+        $("#manicure-header-button").hide();
     }
 
     function show_logo_header(){
@@ -1190,10 +1324,9 @@
     }
 
     function show_logo_header_manicure(){
-        $("#logo-header-manicure").show();
-        $("#btn-menu-manicure").show();
+        $("#manicure-header-button").show();
     }
-    
+    /*
     function show_map(){   
         show_map_panel();
         $.afui.loadContent("#mapa",false,false,"slide");        
@@ -1204,12 +1337,7 @@
                 function(success) {
                     if (map !== null){
                         myLatLng = new google.maps.LatLng(success.coords.latitude, success.coords.longitude);
-                        var myMarker = new google.maps.Marker({
-                            map: map,
-                            icon: {url:'images/ic_my_location_1x_24dp.png',anchor:{x:14,y:14}},
-                            animation: google.maps.Animation.DROP,
-                            position: myLatLng
-                        });
+                        //myMarker.setPosition(myLatLng);
                         map.setCenter(myLatLng);
                         map.setZoom(16);
                         show_map_panel();
@@ -1228,11 +1356,12 @@
                 { timeout: 10000 }
             )
         }
-    }    
+    } 
+    */   
     
-   function writeCookie(name, value) {
-      var cookie = [name, '=', JSON.stringify(value), '; path=/;'].join('');
-      document.cookie = cookie;
+    function writeCookie(name, value) {
+        var cookie = [name, '=', JSON.stringify(value), '; path=/;'].join('');
+        document.cookie = cookie;
     }
 
     function readCookie(name) {
@@ -1241,6 +1370,7 @@
      return result;
     }
 
+    /*
     function add_search_box(map){
         // Create the search box and link it to the UI element.
         var input = document.getElementById('pac-input');
@@ -1288,26 +1418,20 @@
             map.fitBounds(bounds);
             myLatLng = map.getCenter(); 
             update_address_bar(myLatLng);
-            console.log(myLatLng.lat()+' '+myLatLng.lng());
-            /*  
-            if (_llbounds === null) {
-                //Create the rectangle in geographical coordinates
-                _llbounds = new google.maps.LatLngBounds(new google.maps.LatLng(p.coords.latitude, p.coords.longitude)); //original
-            } else {
-                //Extends geographical coordinates rectangle to cover current position
-                _llbounds.extend(myLatLng);
-            }
-            //Sets the viewport to contain the given bounds & triggers the "zoom_changed" event
-            _map.fitBounds(_llbounds);  
-            */
+            console.log(myLatLng.lat()+' '+myLatLng.lng());            
         }); //SearchBox
     }
-
-    function initMap() {
+    */
+    /*
+    function initMap() {        
         geocoder= new google.maps.Geocoder();
-        myLatLng = new google.maps.LatLng(-18.9064, -41.9666);
-        $
+        myLatLng = new google.maps.LatLng(-18.9064, -41.9666);        
         map = new google.maps.Map(document.getElementById('map-canvas'), {
+            zoom: 3,
+            center: myLatLng,
+            disableDefaultUI: true
+        });
+        map2 = new google.maps.Map(document.getElementById('map-canvas2'), {
             zoom: 3,
             center: myLatLng,
             disableDefaultUI: true
@@ -1315,17 +1439,25 @@
         
         $(document).on('pagechange', function(){
             google.maps.event.trigger(map,'resize');
+            google.maps.event.trigger(map2,'resize');
         });
 
         add_search_box(map);
-        var myMarker = new google.maps.Marker({
+        myMarker = new google.maps.Marker({
             map: map,
             icon: {url:'images/ic_my_location_1x_24dp.png',anchor:{x:14,y:14}},
-            animation: google.maps.Animation.DROP,
+            //animation: google.maps.Animation.DROP,
             //position: mylocation
         });
         
-        addYourLocationButton(map,  myMarker); 
+        myMarker2 = new google.maps.Marker({
+            map: map2,
+            icon: {url:'images/ic_my_location_1x_24dp.png',anchor:{x:14,y:14}},
+            //animation: google.maps.Animation.DROP,
+            //position: mylocation
+        });
+        addYourLocationButton(map,  myMarker);
+        addYourLocationButton(map2,  myMarker2); 
         
         google.maps.event.addListener(map, 'dragstart', function() {
         hide_map_panel();       
@@ -1336,6 +1468,11 @@
           myLatLng = map.getCenter();         
             update_address_bar(myLatLng);
         });
+
+        google.maps.event.addListener(map2, 'dragend', function() {
+          myLatLng = map.getCenter();         
+        });
+
         google.maps.event.addListener(map, 'zoom_changed', function() {
             if (this.getZoom() < 10) {
                 // Change max/min zoom here
@@ -1344,7 +1481,8 @@
             }
         })
     }
-
+    */
+    /*
     function update_address_bar(latlng){
         myLatLng=latlng;
         geocoder.geocode({'location': latlng}, function(results, status) {
@@ -1361,7 +1499,7 @@
         }
       });   
     }
-
+    
     function addYourLocationButton(map, marker){
       var controlDiv = document.createElement('div');
 
@@ -1405,12 +1543,13 @@
           if(navigator.geolocation) {           
               navigator.geolocation.getCurrentPosition(function(position) {
                 myLatLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                console.log('location',myLatLng);
                 marker.setPosition(myLatLng);
                 map.setCenter(myLatLng);
                 clearInterval(animationInterval);
                 $('#you_location_img').css('background-position', '-144px 0px');
                 update_address_bar(myLatLng);
-                        });
+            });
           }
           else{
               clearInterval(animationInterval);
@@ -1421,6 +1560,7 @@
       controlDiv.index = 1;
       map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
     } 
+    */
 
     function update_drawer(){
         if (user.getCurrentUser()){
@@ -1442,22 +1582,9 @@
 
     function manicure_cronometro(){
         //hide_header("#af-header-2");        
-        hide_logo_header_manicure();        
+        //hide_logo_header_manicure();        
         $.afui.loadContent("#manicure-cronometro",false,false,"up");
         $.afui.setTitle('Atendimento Agora');
         $.afui.setBackButtonVisibility(false);
         countdown.start();
-    }      
-    
-//})();
-
-// The app.Ready event shown above is generated by the init-dev.js file; it
-// unifies a variety of common "ready" events. See the init-dev.js file for
-// more details. You can use a different event to start your app, instead of
-// this event. A few examples are shown in the sample code above. If you are
-// using Cordova plugins you need to either use this app.Ready event or the
-// standard Crordova deviceready event. Others will either not work or will
-// work poorly.
-
-// NOTE: change "dev.LOG" in "init-dev.js" to "true" to enable some console.log
-// messages that can help you debug Cordova app initialization issues.
+    } 
