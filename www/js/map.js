@@ -471,8 +471,8 @@ var  Map_manicure = function(){
     }
 
     this.startWatch = function(){
-        this.bgGeo();
-        /*
+        //this.bgGeo();
+        
         var that=this;        
         this.watchPosition({accuracy:true},function(r){
             //console.log('updateGeoLocation',r.lat.toString(),r.lng.toString());
@@ -481,7 +481,7 @@ var  Map_manicure = function(){
             that.myLatLng = new google.maps.LatLng(r.lat, r.lng);
             that.myMarker.setPosition(r);
         },this.calldialohGPS);
-        */
+        
     }
 
     this.bgGeo = function(){
