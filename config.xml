@@ -21,7 +21,7 @@
     <allow-intent href="google.navigation:*" />
     <allow-intent href="cdvfile://*" />
     <preference name="phonegap-version" value="cli-6.1.0" />
-    <preference name="android-targetSdkVersion" value="21" />
+    <preference name="android-targetSdkVersion" value="16" />
     <preference name="android-installLocation" value="auto" />
     <preference name="orientation" value="portrait" />
     <preference name="android-build-tool" value="gradle" />
@@ -78,16 +78,15 @@
         </feature>
         <preference name="StatusBarOverlaysWebView" value="false" />
     </platform>
-    
     <plugin source="git" spec="https://github.com/Viras-/cordova-plugin-powermanagement.git" />
-    <plugin spec="https://github.com/rodrigo-martinezd/cordova-dialog-gps.git" source="git" />
+    <plugin source="git" spec="https://github.com/rodrigo-martinezd/cordova-dialog-gps.git" />
     <plugin source="git" spec="https://github.com/Initsogar/cordova-webintent.git" />
-    <plugin spec="https://github.com/Diusrex/cordova-toforeground.git" source="git" />    
-    <plugin name="cordova-plugin-keepe-cardio" source="npm" />    
-    <plugin name="cordova-plugin-app-version" source="npm" />   
+    <plugin source="git" spec="https://github.com/Diusrex/cordova-toforeground.git" />
+    <plugin name="cordova-plugin-keepe-cardio" source="npm" />
+    <plugin name="cordova-plugin-app-version" source="npm" />
     <plugin name="cordova-plugin-camera" source="npm" />
     <plugin name="cordova-plugin-compat" source="npm" />
-    <plugin name="cordova-plugin-device" source="npm" />    
+    <plugin name="cordova-plugin-device" source="npm" />
     <plugin name="cordova-plugin-dialogs" source="npm" />
     <plugin name="cordova-plugin-digits">
         <param name="FABRIC_API_KEY" value="a6edd807a9ceac315bb2097e2c1bd6667494503f" />
@@ -110,16 +109,16 @@
     <plugin name="cordova-plugin-statusbar" source="npm" />
     <plugin name="cordova-plugin-vibration" source="npm" />
     <plugin name="cordova-plugin-whitelist" source="npm" />
-    <plugin name="cordova-plugin-x-socialsharing" source="npm" />    
-    <plugin name="mp-cordova-plugin-geolocation" source="npm" />    
+    <plugin name="cordova-plugin-x-socialsharing" source="npm" />
+    <plugin name="mp-cordova-plugin-geolocation" source="npm" />
     <plugin name="phonegap-plugin-push" source="npm">
         <param name="SENDER_ID" value="499027471276" />
     </plugin>
-
-    <plugin name="cordova-plugin-background-mode" />                    
+    <plugin name="cordova-plugin-background-mode" />
     <plugin name="cordova-plugin-crosswalk-webview" source="npm" />
-    <!--plugin name="cordova-plugin-googlemaps" source="npm" >
-        <param name="API_KEY_FOR_ANDROID" value="AIzaSyD52ypHD6_XH-vQEZkF69jMRrowUZT_sPE" />
-        <param name="API_KEY_FOR_IOS" value="AIzaSyA7ANNfLad4n7GXH4-Q6QLeuLpmsQYIcVM" />
-    </plugin -->
+    <preference name="xwalkVersion" value="20+" />
+    <preference name="xwalkCommandLine" value="--disable-pull-to-refresh-effect" />
+    <preference name="xwalkMode" value="embedded" />
+    <preference name="xwalkMultipleApk" value="true" />
+    <preference name="android-minSdkVersion" value="16" />
 </widget>
