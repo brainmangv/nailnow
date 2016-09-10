@@ -402,7 +402,7 @@ var Map_cliente = function(){
     }
 
     this.updateManicureMarks = function(){
-       //console.log('escutando');
+       console.log('escutando');
         $oauth.getGeolocations()        
         .done(function(r){
             map_cliente.manicureMarks.deleteMarkers();            
@@ -471,13 +471,18 @@ var  Map_manicure = function(){
     }
 
     this.startWatch = function(){
-        //this.bgGeo();
+        this.bgGeo();
         
-        var that=this;        
+        var that=this;
+        /*setInterval(function(){              
+              $('#you_location_img').css('background-position', imgX+'px 0px');
+          }, 5000);*/
+        
         this.watchPosition({accuracy:true},function(r){
+            $.afui.toast({message:r.lat.toString()+','+r.lng.toString(),position:'bc'});
             //console.log('updateGeoLocation',r.lat.toString(),r.lng.toString());
-            if(that.online) 
-                $oauth.updateGeoLocation(user.current.id,r.lat.toString(),r.lng.toString());
+            //if(that.online) 
+            //    $oauth.updateGeoLocation(user.current.id,r.lat.toString(),r.lng.toString());
             that.myLatLng = new google.maps.LatLng(r.lat, r.lng);
             that.myMarker.setPosition(r);
         },this.calldialogGPS);
@@ -487,7 +492,8 @@ var  Map_manicure = function(){
     this.bgGeo = function(){
         var callbackFn = function(location) {
             console.log('[js] BackgroundGeolocation callback:  ' + location.latitude + ',' + location.longitude);
-
+            if(that.online) 
+                $oauth.updateGeoLocation(user.current.id,r.lat.toString(),r.lng.toString());
             // Do your HTTP request here to POST location to your server.
             // jQuery.post(url, JSON.stringify(location));
 
@@ -508,6 +514,10 @@ var  Map_manicure = function(){
             desiredAccuracy: 0,
             stationaryRadius: 0,
             distanceFilter: 0,
+            //url: 'http://192.168.1.5:3000/locations',
+            locationProvider: backgroundGeolocation.provider.ANDROID_ACTIVITY_PROVIDER,
+            fastestInterval: 500,
+            activitiesInterval: 1000,
             debug: true,
             interval: 6000
         });
