@@ -16,10 +16,11 @@
     var order = {};    
     var map_cliente = new Map_cliente();
     var map_manicure = new Map_manicure();
-    var current_agendamento_id;
+    var popup_pedido_agora;
+    var current_agendamento_id;    
     //var myMarker;
     //var myMarker2;
-    var $oauth = new Oauth('http://api.nailnow.co');
+    var $oauth = new Oauth('https://api.nailnow.co');
     var USER_IMAGE_PATH= 'http://api.nailnow.co/images/users/';
     var countdown =  $("#countdown").countdown360({
         radius      : ($(document).width()/2) - 60,
@@ -30,8 +31,7 @@
         fontColor   : '#FFFFFF',
         autostart   : false,
         onComplete  : function () { 
-            $.afui.clearHistory();
-            $.afui.loadContent("#manicure",false,false,"slide");
+            $.afui.goBack();
             $.afui.setBackButtonVisibility(true);
             show_header('#af-header-2');
             console.log('countdown done') 
@@ -63,20 +63,17 @@
     }, "Por favor, forneça um numero válido.");
     document.addEventListener("app.Ready", init, false);
     document.addEventListener("app.Ready", register_event_handlers, false);
-    //document.addEventListener("app.Ready", initMap, false);
     //document.addEventListener("app.Ready", deviceSim, false);
-    //document.addEventListener("app.Ready", geolocationAutoUpdate, false);
     //document.addEventListener("app.Ready", setupPush, false);
 
-    function init(){                
+    function init(){           
         
-        redirect_if_logged();
+        redirect_if_logged();        
     }
 
     function register_event_handlers(){
         $.afui.loadDefaultHash=false;        
-        window.BOOTSTRAP_OK = true;
-        //if (window.cordova && cordova.plugins.backgroundMode) cordova.plugins.backgroundMode.enable();
+        window.BOOTSTRAP_OK = true;        
         console.log('appready');
         if (window.cordova){        
             cordova.getAppVersion().done(
@@ -114,96 +111,76 @@
             navigator.splashscreen.hide();
         }
 
-        //btn-login2
-        $("#btn-login2").on("click",function(){
-            var validator = $('#frm-login').validate({
-                rules: {
-                    login_email: {
-                        required: true,
-                        email: true
-                    },
-                    login_senha: {
-                        required:true,
-                        minlength: 8
-                    },
-                }
-            });
-            if (validator.form()){
-                var email= $("#login_email").val();
-                var senha= $("#login_senha").val();
-                user.login(email,senha)
-                .done(function(){
-                    redirect_if_logged();
-                });                
-            }            
+        //frm-login
+        $("#frm-login,#frm-registrar,#frm-confirmacao-agendamento,#frm-add-cartao").on("keypress",function(k){
+            if ( k.keyCode==13 && k.target.dataset.dependency) $(k.target.dataset.dependency).focus();
+
         });
 
-        //btn-registrou. mostra o mapa principal
-        $("#btn-registrou").on("click",function(){            
-            // Currently only accentColor and backgroundColor is supported.
-            // Note: These have no effect on Android.
-            var validator = $('#frm-registrar').validate({
-                    rules: {
-                        reg_nome: {
-                            required: true,
-                            minlength: 4
-                        },
-                        reg_email: {
-                            required: true,
-                            email: true
-                        },
-                        reg_senha: {
-                            required:true,
-                            minlength: 8
-                        },
-                        reg_confirme_senha : {
-                            equalTo : "#reg_senha"
-                        }
-                    }
-                });
-            var options = {
-              accentColor: '#ff0000',
-              backgroundColor: '#ffffff',
-            };
-            if (validator.form()){                
-                console.log("iniciando digits");
-                hide_logo_header(); 
-                try{
-                    window.plugins.digits.authenticate(options,
-                        function (oAuthHeaders) {
-                            var nome =$("#reg_nome").val();
-                            var email=$("#reg_email").val();
-                            var senha=$("#reg_senha").val();
-                            var telefone=oAuthHeaders.phonenumber;
-                            console.log('Digits:: ',oAuthHeaders);
-
-                            user.signup(tipo_usuario,nome,email,senha,telefone,null)
-                                .then(function(){
-                                    if (tipo_usuario=='M')                         
-                                        $.afui.loadContent("#manicure",false,false,"slide")
-                                    else map_cliente.show_map();
-                                });
-                        },
-                        function(error) {
-                            console.warn("[Digits]", "Login failed", error);
-                        }
-                    );
-                }catch (e){
-                    console.log(e);
-                }                   
-            }
-        });
+        
         
         //Editar conta
-        $(".sidemenu-header").on("click",function(evt){
-            $.afui.drawer.hide("#sidemenu");      
-            hide_logo_header();
-            $.afui.loadContent("#editar_conta",false,false,"slide");            
+        $(".userimg").on("click",function(evt){
+            function onConfirm(buttonIndex) {
+                alert('You selected button ' + buttonIndex);
+            }
+
+            navigator.notification.confirm(
+                'Voce gostaria de alterar sua imagem ?', // message
+                 onConfirm,            // callback to invoke with index of button pressed
+                'Game Over',           // title
+                ['Restart','Exit']     // buttonLabels
+            );
+            getImage();
+            //$.afui.drawer.hide("#sidemenu");      
+            //hide_logo_header();
+            //$.afui.loadContent("#editar_conta",false,false,"slide");            
             /*remove("left").reverse().end(function(){
                 this.classList.remove("active");
             }).run("slide-out");
             */            
-        });   
+        });  
+
+        function getImage() {
+            // Retrieve image file location from specified source
+            navigator.camera.getPicture(uploadPhoto, function(message) {
+            alert('get picture failed');
+            },{
+                quality: 50, 
+                destinationType: navigator.camera.DestinationType.FILE_URI,
+                sourceType: navigator.camera.PictureSourceType.PHOTOLIBRARY
+            }
+                );
+        } 
+
+        function uploadPhoto(imageURI) {
+            var options = new FileUploadOptions();
+            options.fileKey="file";
+            options.fileName=imageURI.substr(imageURI.lastIndexOf('/')+1);
+            options.mimeType="image/jpeg";
+ 
+            var params = new Object();
+            params.value1 = "test";
+            params.value2 = "param";
+ 
+            options.params = params;
+            options.chunkedMode = false;
+ 
+            var ft = new FileTransfer();
+            //ft.upload(imageURI, "http://yourdomain.com/upload.php", win, fail, options);
+        }
+
+        function win(r) {
+            console.log("Code = " + r.responseCode);
+            console.log("Response = " + r.response);
+            console.log("Sent = " + r.bytesSent);
+            alert(r.response);
+        }
+ 
+        function fail(error) {
+            alert("An error has occurred: Code = " + error.code);
+        }
+
 
         $('#sidemenu').on('swipeLeft',function(){$.afui.drawer.hide("#sidemenu")});
 
@@ -467,6 +444,47 @@
                 })
         });
 
+        //historico-detail panelbeforeload
+        $("#historico-detail").on("panelbeforeload",function(){
+            console.log('historico-detail detail');            
+        	$("#historico-detail").html('');
+            $oauth.getagendamentoId(current_agendamento_id)
+                .done(function(r){                 
+                    var d=new Date(r.data_hora);
+                    var mes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                                'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+                    var diaDaSemana=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sabádo'];  
+                  var html='<p class="formGroupHead grid-pad">Detalhes do Pedido</p>'+
+                    '<ul class="list inset">'+
+                    '<li class="urow vertical-col">'+
+                        '<div class="col"><p class="border-bottom">'+r.manicure_nome+'</p></div>'+
+                        '<div class="col col2"><p class=" border-bottom">'+ diaDaSemana[d.getDay()]+' ' +d.getDate()+'/'+
+                                    mes[d.getMonth()] +'</p></div>'+
+                        '<div class="col col2 last"><p class=" border-bottom">'+r.data_hora.substr(-8,5)+'</p></div>'+
+                        '<div class="col col3-4"><p class="border-bottom">'+r.endereco+'</p></div>'+
+                        '<div class="col col1-4 last"><p class="border-bottom">'+r.numero+'</p></div>'+
+                        '<div class="col col3-4"><p class="border-bottom">'+r.cidade+'</p></div>'+
+                        '<div class="col col1-4 last"><p class="border-bottom">'+r.uf+'</p></div>'+
+                        '<div class="col"><p class="border-bottom icon phone"><a href="tel:'+r.telefone+'" >'+r.telefone+'</a></p></div>'+
+                    '</li>'+
+                    '</ul>'+
+                    '<p class="grid-pad formGroupHead">Servicos</p>'+
+                    '<ul class="list inset">'+
+                        '<li class="urow">'+
+                            '<div class="list-header urow">'+
+                                '<div class="col col3-4"><p>&nbsp; Item</p></div>'+
+                                '<div class="col col1-4 vertical-col center"><p>QTD</p></div>'+
+                            '</div>';
+                            var servicos= JSON.parse(r['servicos']);
+                            servicos.forEach(function(s){
+                                html+='<div class="col col3-4 "><p class="border-bottom">'+s.descricao+'</p></div>'+
+                            '<div class="col col1-4 last vertical-col center"><p class="border-bottom">'+s.qtd+'</p></div>';
+                            });
+                        html+='</li></ul>';
+                  $("#historico-detail").html(html);
+                });		
+        });
+
         //btn-meios-pgto
         $("#btn-meios-pgto").on("click",function(){
              hide_logo_header();
@@ -520,21 +538,38 @@
         });
 
         //btn-sair
-        $("#btn-sair").on("click",function(){
+        $(".btn-sair").on("click",function(){
+            if (user.current.tipo=='C'){
+                map_cliente.stopWatchManicure();
+                map_cliente.stopWatch();
+            } else{
+                map_manicure.stopWatch();
+            }            
             user.logout();            
-            //alert('saindo');            
-            $.afui.loadContent("#main",false,false,"slide");    
-            $.afui.drawer.hide("#sidemenu"); 
             if (window.plugins && window.plugins.digits)
                 window.plugins.digits.logout();
+            $.afui.loadContent("#main",false,false,"slide");    
+            $.afui.drawer.hide("#sidemenu");            
         });
 
-        //btn_manicure_calendar
+        //btn_manicure-calendar
         $("#btn-manicure-calendar").on("click",function(){
             hide_logo_header_manicure();
             $.afui.loadContent("#manicure-calendar",false,true,"up");
         });
+
+        //btn_manicure-home
+        $("#btn-manicure-home").on("click",function(){
+            //hide_logo_header_manicure();
+            $.afui.loadContent("#manicure",false,true,"up");
+        });
       
+        //btn_manicure-conta
+        $("#btn-manicure-conta").on("click",function(){
+            //hide_logo_header_manicure();
+            $.afui.loadContent("#manicure-menu",false,true,"up");
+        });
+
         //manicure_calendar panelload
         $("#manicure-calendar").on("panelbeforeload",function(){
             $("#manicure-calendar").html('<ul class="list agenda"></ul>');
@@ -582,8 +617,7 @@
                     var mes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
                                 'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
                     var diaDaSemana=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sabádo'];  
-                  $("#manicure-calendar-detail").html(                    
-                    '<p class="formGroupHead grid-pad">Detalhes do Pedido</p>'+
+                    var html='<p class="formGroupHead grid-pad">Detalhes do Pedido</p>'+
                     '<ul class="list inset">'+
                     '<li class="urow vertical-col">'+
                         '<div class="col"><p class="border-bottom">'+r.cliente_nome+'</p></div>'+
@@ -592,8 +626,8 @@
                         '<div class="col col2 last"><p class=" border-bottom">'+r.data_hora.substr(-8,5)+'</p></div>'+
                         '<div class="col col3-4"><p class="border-bottom">'+r.endereco+'</p></div>'+
                         '<div class="col col1-4 last"><p class="border-bottom">'+r.numero+'</p></div>'+
-                        '<div class="col col2"><p class="border-bottom">'+r.cidade+'</p></div>'+
-                        '<div class="col col2 last"><p class="border-bottom">'+r.uf+'</p></div>'+
+                        '<div class="col col3-4"><p class="border-bottom">'+r.cidade+'</p></div>'+
+                        '<div class="col col1-4 last"><p class="border-bottom">'+r.uf+'</p></div>'+
                         '<div class="col"><p class="border-bottom icon phone"><a href="tel:'+r.telefone+'" >'+r.telefone+'</a></p></div>'+
                     '</li>'+
                     '</ul>'+
@@ -603,16 +637,14 @@
                             '<div class="list-header urow">'+
                                 '<div class="col col3-4"><p>&nbsp; Item</p></div>'+
                                 '<div class="col col1-4 vertical-col center"><p>QTD</p></div>'+
-                            '</div>'+
-                            '<div class="col col3-4 "><p class="border-bottom">Descricao do item</p></div>'+
-                            '<div class="col col1-4 last vertical-col center"><p class="border-bottom">1</p></div>'+
-                            '<div class="col col3-4 "><p>Descricao do item</p></div>'+
-                            '<div class="col col1-4 last vertical-col center"><p class="border-bottom">1</p></div>'+
-                            '<div class="col col3-4 "><p class="border-bottom">Descricao do item</p></div>'+
-                            '<div class="col col1-4 last vertical-col center"><p class="border-bottom">1</p></div>'+
-                        '</li>'+
-                    '</ul>'
-                  );
+                            '</div>';
+                             var servicos= JSON.parse(r['servicos']);
+                             servicos.forEach(function(s){
+                                html+='<div class="col col3-4 "><p class="border-bottom">'+s.descricao+'</p></div>'+
+                                '<div class="col col1-4 last vertical-col center"><p class="border-bottom">'+s.qtd+'</p></div>';
+                            });
+                    html+='</li></ul>';
+                   $("#manicure-calendar-detail").html(html);
                 });		
         });
 
@@ -710,29 +742,38 @@
         //confirmacao-manicures
         $("#confirmacao-manicures").on('panelbeforeload',function(){
             $("#lista-manicures").html('');
-            $oauth.getManicures().done(function(r){
-                r._embedded.usuario.
-                forEach(function(e,i){
-                    var imgSrc=e.imagem? e.imagem:'images/girl-avatar.png';
-                    var pontuacao=e.pontuacao/5*100;
-                    $("#lista-manicures").append(
-                    '<li class="grid">'+
-                        '<a class="btn-lista-manicures" data-id='+e.id+'>'+
-                        '<img src="'+imgSrc+'">'+
-                        '<div class="nome" >'+e.nome+'</div>'+
-                        '<div class="star-ratings">'+
-                            '<div class="star-ratings-sprite" style="">'+
-                                '<span style="width:'+pontuacao+'%" class="star-ratings-sprite-rating"></span>'+
+            $oauth.getManicures(order.tipo).done(function(r){
+                if (r.manicures.length>0){
+                    r.manicures.
+                    forEach(function(e,i){
+                        var imgSrc=e.imagem? e.imagem:'images/girl-avatar.png';
+                        var pontuacao=e.pontuacao/5*100;
+                        $("#lista-manicures").append(
+                        '<li class="grid">'+
+                            '<a class="btn-lista-manicures" data-id='+e.id+'>'+
+                            '<img src="'+imgSrc+'">'+
+                            '<div class="nome" >'+e.nome+'</div>'+
+                            '<div class="star-ratings">'+
+                                '<div class="star-ratings-sprite" style="">'+
+                                    '<span style="width:'+pontuacao+'%" class="star-ratings-sprite-rating"></span>'+
+                                '</div>'+
+                                '<p>'+e.num_avaliacoes+' avaliacoes</p>'+
                             '</div>'+
-                            '<p>'+e.num_avaliacoes+' avaliacoes</p>'+
-                        '</div>'+
-                        '</a>'+
-                    '</li>');
-                });               
-                $(".btn-lista-manicures").on("click",function(e){
+                            '</a>'+
+                        '</li>');
+                    });
+                }else{
+                    $("#lista-manicures").html('<div class="vcenter-historico"><p>Não há profissionais online no momento.</p></div>');                    
+                }
+
+                $(".btn-lista-manicures").on("click",function(e){                    
                     order.manicure_id =e.currentTarget.dataset.id;
-                    console.log(order);            
-                    $.afui.loadContent("#confirmacao-data-hora",false,false,"slide");                    
+                    console.log(order);
+                    if (order.tipo=="now"){
+                        order.data_hora= new Date();            
+                        order.data_hora_fim=order.data_hora_fim=new Date(order.data_hora.getTime() + (order.duracao*60000));
+                        $.afui.loadContent("#confirmacao-resumo",false,false,"slide");
+                    }else $.afui.loadContent("#confirmacao-data-hora",false,false,"slide");                                    
                 });     
              });
         });        
@@ -874,14 +915,55 @@
 
         //btn-confirmacao-resumo
         $("#btn-confirmacao-resumo").on("click",function(){
+            if (order.tipo=="now")
+                confirmar_pedido_agora()
+            else{
+               
+            }
+        });
+        
+        function confirmar_pedido_agora(){
+            var endereco=order.endereco+' , '+order.numero+' '+order.bairro+' , '+order.cidade;
+            var indeterminateProgress;
+            var data ={
+                'to':order.manicure_id,
+                'data':{
+                    'title':'Pedido de Agendamento Agora',
+                    'cliente_id': order.cliente_id,
+                    'tipo':'agendamento_agora',
+                    'endereco': endereco,
+                    'lat': order.address.geometry.location.lat(),
+                    'lng': order.address.geometry.location.lng(),
+                    'content-available' : '1'
+                }
+            }
+            console.log('push',data);
+            $oauth.push(data);
+            $.afui.showMask('Aguarde, localizando o profissional..');
+			$.afui.blockUI(.2);
+            /*
+            popup_pedido_agora=$.afui.popup( {
+                title:"Solicitando",
+                message:"Aguarde, tentando contatar a profissional",
+                cancelText:"Cancelar",
+                cancelCallback: function(){},
+                
+                cancelOnly:true
+            });
+            $('.afPopup div').first().append('<img src="images/loading.gif" width=60>')
+            */
+            
+        }
+
+        function agendar(){
             var data=order;
             delete data.address;
             delete data.duracao;
             //data.data_hora= order.data_hora.toLocaleDateString();
             $oauth.agendar(data)
             .done(function(r){
-                  console.log('resposta',r);
-                   $.afui.popup( {
+                console.log('resposta',r);
+                $.afui.popup( {
                         title:"Sucesso",
                         message:"Seu agendamento foi confirmado, breve a profissional entrará em contato com você.",
                         cancelText:"Ok",
@@ -894,8 +976,8 @@
                 var message =typeof e.responseJSON !== 'undefined' ? e.responseJSON.detail : 'Erro no processamento';
                 $.afui.popup({title:'Falha',message: message,cancelOnly:true,cancelText:'OK'})
             });
-        });
-        
+        }
+
         //meios-pgto
         $("#meios-pgto").on("panelbeforeload",function(){
             update_numero_cartao($(".cartao-credito p"));
@@ -991,34 +1073,171 @@
                 $("#btn-ficar-online").animation().run('btn-loading').reverse().end(f);
             }
 
-            function ficar_offline(){
+            function ficar_offline(){                
                 $oauth.updateStatus(user.current.id,'offline')
                     .done(function(){
+                        map_manicure.online=false;
                         btn_loading_reverse(function(){
                             $("#btn-ficar-online").removeClass('btn-black');
                             $("#btn-ficar-online").addClass('btn-pink');
                             $("#btn-ficar-online").html('FICAR ONLINE');
                             $.afui.toast({message:'Voce esta offline',position:'tc'});
-                            map_manicure.stop_pbar();
+                            if (window.cordova && cordova.plugins.backgroundMode) {
+                                cordova.plugins.backgroundMode.disable();
+                            }
+                            map_manicure.stopProgressBar();
                         });
+                    })
+                    .fail(function(){
+
                     }); 
             }
 
             function ficar_online(){
                 $oauth.updateStatus(user.current.id,'online')
                     .done(function(){
+                        map_manicure.online=true;
                         btn_loading_reverse(function(){
                             $("#btn-ficar-online").removeClass('btn-pink');
                             $("#btn-ficar-online").addClass('btn-black');
                             $("#btn-ficar-online").html('FICAR OFFLINE');
                             $.afui.toast({message:'Voce esta online',position:'tc'});
-                            map_manicure.start_pbar();
+                            if (window.cordova && cordova.plugins.backgroundMode) {
+                                cordova.plugins.backgroundMode.setDefaults({ text:'Nailnow continua ativo em backgroud'});
+                                cordova.plugins.backgroundMode.enable();
+                            }
+                            map_manicure.startProgressBar();
                         });
                     });
             }
         });
              
+        //btn-cronometro-aceitar
+        $('#btn-cronometro-aceitar').on('click',function(){
+           var data ={
+                'to': order.cliente_id,
+                'data':{
+                    'tipo':'agendamento_agora_aceito',                    
+                    'content-available' : '1'
+                }
+            }
+            console.log('agendamento_agora_aceito',data);
+            $oauth.push(data);
+            countdown.stop();
+            $.afui.loadContent("#manicure");
+            map_manicure.tracaRota(order.lat,order.lng);
+        });
+        
+        //btn-cronometro-recusar
+        $('#btn-cronometro-recusar').on('click',function(){
+            var data ={
+                'to': order.cliente_id,
+                'data':{
+                    'tipo':'agendamento_agora_recusado',                    
+                    'content-available' : '1'
+                }
+            }
+            $oauth.push(data);
+            countdown.stop();
+            $.afui.loadContent("#manicure");
+        });
+
+        $("#btn-map-route").on("click",function(){
+            window.open("google.navigation:q="+order.lat+' '+order.lng+"&mode=d" , '_system');
+            //launchnavigator.navigate([order.lat, order.lng], {
+            //    start: [map_manicure.myLatLng.lat(),map_manicure.myLatLng.lng()]
+            //});
+        });
     } //register_event_handlers
+
+    //btn-login2
+    function do_frm_login(){
+        var validator = $('#frm-login').validate({
+            rules: {
+                login_email: {
+                    required: true,
+                    email: true
+                },
+                login_senha: {
+                    required:true,
+                    minlength: 8
+                },
+            }
+        });
+        if (validator.form()){
+            var email= $("#login_email").val();
+            var senha= $("#login_senha").val();
+            user.login(email,senha)
+            .done(function(){
+                redirect_if_logged();
+            })
+            .fail(function(e){
+                console.log('falha de login',e)
+            });                
+        }            
+        return false;
+    };
+
+    //btn-registrou. mostra o mapa principal
+    function do_frm_registrar(){
+        // Currently only accentColor and backgroundColor is supported.
+        // Note: These have no effect on Android.
+        var validator = $('#frm-registrar').validate({
+                rules: {
+                    reg_nome: {
+                        required: true,
+                        minlength: 4
+                    },
+                    reg_email: {
+                        required: true,
+                        email: true
+                    },
+                    reg_senha: {
+                        required:true,
+                        minlength: 8
+                    },
+                    reg_confirme_senha : {
+                        equalTo : "#reg_senha"
+                    }
+                }
+            });
+        var options = {
+          accentColor: '#ff0000',
+          backgroundColor: '#ffffff',
+        };
+        if (validator.form()){                
+            console.log("iniciando digits");
+            hide_logo_header(); 
+            try{
+                window.plugins.digits.authenticate(options,
+                    function (oAuthHeaders) {
+                        var nome =$("#reg_nome").val();
+                        var email=$("#reg_email").val();
+                        var senha=$("#reg_senha").val();
+                        var telefone=oAuthHeaders.phonenumber;
+                        console.log('Digits:: ',oAuthHeaders);
+
+                        user.signup(tipo_usuario,nome,email,senha,telefone,null)
+                            .then(function(){
+                                update_drawer();
+                                if (tipo_usuario=='M')                         
+                                    $.afui.loadContent("#manicure",false,false,"slide")
+                                else {
+                                    map_cliente.initMap();
+                                    map_cliente.show_map();
+                                }                        
+                            });
+                    },
+                    function(error) {
+                        console.warn("[Digits]", "Login failed", error);
+                    }
+                );
+            }catch (e){
+                console.log(e);
+            }                   
+        }
+        return false;
+    };
 
     function static_map(latlng,width,height,zoom){
         var google_img="https://maps.googleapis.com/maps/api/staticmap?"+ 'size='+width+'x'+height+
@@ -1156,19 +1375,19 @@
     function redirect_if_logged(){
         if(!$oauth.isExpired()){
             if(user.getCurrentUser()){
-                user.registerPushNotification();                
+                user.registerPushNotification0();                
                 update_drawer();
                 switch(user.current.tipo){
                     case 'C':
                         tipo_usuario='C';                        
                         map_cliente.initMap();
-                        //map_cliente.show_map();
-                        $.afui.loadContent("#mapa",false,false,"slide");
-                        map_cliente.centerCurrentLocation();
+                        map_cliente.show_map();
+                        //$.afui.loadContent("#mapa",false,false,"slide");
+                        //map_cliente.centerCurrentLocation();
                         break;
                     case 'M':
                         tipo_usuario='M';
-                        map_manicure.initMap();                        
+                        map_manicure.initMap();                                                
                         $.afui.loadContent("#manicure",false,false,"slide");
                         map_manicure.centerCurrentLocation();
                         break;               
@@ -1564,10 +1783,10 @@
 
     function update_drawer(){
         if (user.getCurrentUser()){
-            if(user.getCurrentUser().imagem) $("#userimg").attr('src',user.getCurrentUser().imagem);
+            if(user.getCurrentUser().imagem) $(".userimg").attr('src',user.getCurrentUser().imagem);
 
-            $("#username").text(user.getCurrentUser().nome);
-            $("#useremail").text(user.getCurrentUser().email);
+            $(".username").text(user.getCurrentUser().nome);
+            $(".useremail").text(user.getCurrentUser().email);
         }
     } 
     function hide_header(id){
@@ -1588,3 +1807,65 @@
         $.afui.setBackButtonVisibility(false);
         countdown.start();
     } 
+
+     function onNotification(e) {
+       console.log('<li>EVENT -> RECEIVED:',e);
+        
+        switch( e.event )
+        {
+            case 'registered':
+            if ( e.regid.length > 0 )
+            {
+                //console.log('<li>REGISTERED -> REGID:' + e.regid + "</li>");
+                // Your GCM push server needs to know the regID before it can push to this device
+                // here is where you might want to send it the regID for later use.
+                console.log("regID = " + e.regid);
+            }
+            break;
+            
+            case 'message':
+                // if this flag is set, this notification happened while we were in the foreground.
+                // you might want to play a sound to get the user's attention, throw up a dialog, etc.
+                if (e.foreground)
+                {
+                    alert('<li>--INLINE NOTIFICATION--' + '</li>');
+                        
+                        // on Android soundname is outside the payload. 
+                            // On Amazon FireOS all custom attributes are contained within payload
+                            var soundfile = e.soundname || e.payload.sound;
+                            // if the notification contains a soundname, play it.
+                            // playing a sound also requires the org.apache.cordova.media plugin
+                            var my_media = new Audio("/android_asset/www/sound/"+ soundfile);
+
+                    my_media.play();
+                }
+                else
+                {	// otherwise we were launched because the user touched a notification in the notification tray.
+                    if (e.coldstart){
+                        alert('<li>--COLDSTART NOTIFICATION--' + '</li>');
+                        console.log('<li>--COLDSTART NOTIFICATION--' + '</li>');
+                    }
+                    else{
+                        alert('<li>--BACKGROUND NOTIFICATION--' + '</li>');
+                        console.log('<li>--BACKGROUND NOTIFICATION--' + '</li>');
+                    }
+                }
+                    
+                console.log('<li>MESSAGE -> MSG: ' + e.payload.message + '</li>');
+                //android only
+                console.log('<li>MESSAGE -> MSGCNT: ' + e.payload.msgcnt + '</li>');
+                //amazon-fireos only
+                //$("#app-status-ul").append('<li>MESSAGE -> TIMESTAMP: ' + e.payload.timeStamp + '</li>');
+            break;
+            
+            case 'error':
+                alert('<li>ERROR -> MSG:' + e.msg + '</li>');
+            break;
+            
+            default:
+                alert('<li>EVENT -> Unknown, an event was received and we do not know what it is</li>');
+            break;
+        }
+    }
+
+    

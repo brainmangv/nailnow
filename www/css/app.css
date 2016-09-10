@@ -316,7 +316,7 @@ body#afui .splt {
 
 @font-face{
   font-family:"Rounded Elegance";
-  src:url("http://www.myfontfree.com/data/88/r/rounded_elegance/Rounded Elegance.ttf");
+  src:url("Rounded Elegance.ttf");
 }
 @media all {
   #afui .grid-pad {
@@ -751,18 +751,18 @@ body#afui .splt {
 .af-sidemenu {
   width: 90%;
 }
-.af-sidemenu .sidemenu-header {
+.sidemenu-header {
   background: #E1014D;
   color: white;
   padding: 10px;
 }
-.af-sidemenu .sidemenu-header img {
+.sidemenu-header img {
   height: 80px;
   margin-right: 10px;
   float: left;
   border-radius: 50%;
 }
-.af-sidemenu .sidemenu-header .name {
+.sidemenu-header .name {
   margin-top: 20px;
 }
 /* The main container*/
@@ -1057,6 +1057,7 @@ ul.slider_texto li.op2 {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     transition: 500ms;
+    min-height: 334px;
 }
 #map-canvas.full{
   height: calc(100vh - 50px);
@@ -1130,6 +1131,11 @@ ul.no-chevron li >a:after{
 .vcenter-historico {
     margin-top: calc(50vh - 93px) !important;
     text-align: center;
+ 
+}
+#lista-manicures .vcenter-historico p{
+  background: #eee;
+  font-size: 18px;
 }
 .list li:active {
     background: #E1014D;
@@ -1171,23 +1177,30 @@ label.error{
 }
 
 .cartao-credito p{
-  padding-top: 1px;
-  padding-left: 42px;
+  padding: 10px 10px 10px 53px;
+  border-bottom: 1px solid #ccc;
+  background-color: white;
+  background-repeat: no-repeat;
+  background-position-y: 8px;
+  background-position-x: 8px;
+}
 }
 .cartao-credito p.visa{
-  background: url('../images/visa.png')no-repeat;
+  background-image: url('../images/visa.png');
 }
 
 .cartao-credito p.mastercard{
-  background: url('../images/mastercard.png')no-repeat;
+  background-image: url('../images/mastercard.png');
+  
+  
 }
 
 .cartao-credito p.diners_clube{
-  background: url('../images/diners_clube.png')no-repeat;
+  background-image: url('../images/diners_clube.png');
 }
 
 .cartao-credito p.elo{
-  background: url('../images/elo.png')no-repeat;
+  background-image: url('../images/elo.png');
 }
 
 #lista-servicos{
@@ -1411,4 +1424,23 @@ footer .button i{
 }
 #main,#sidemenu .panel{
   background: white;
+}
+#manicure-header-button{
+  z-index: 100;
+}
+#map-route{
+    display: none;
+    border: 1px solid rgb(208, 208, 208);
+    display: block;
+    position: absolute;
+    top: -100px;
+    z-index: 1;
+    background: #eee;
+    padding: 5px;
+    transition: 500ms;
+}
+.profile-picture{
+    background: #E1014D;
+    padding: 10px;
+    text-align: center;
 }

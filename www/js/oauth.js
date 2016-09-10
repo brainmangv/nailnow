@@ -13,6 +13,8 @@ function Oauth(apiurl){
 	this.agendarURL =this.apiUrl+ '/agendar';
 	this.apiUrlStatus=this.apiUrl+ '/updatestatus';
 	this.apiUrlGeoposition=this.apiUrl+ '/geopositions';
+	this.apiUrlManicures=this.apiUrl+ '/getmanicures';
+	this.apiUrlPush=this.apiUrl+ '/push';
 	this.servicos=null;
 	var access_token;
 	var refresh_token;
@@ -142,15 +144,21 @@ Oauth.prototype ={
 	},
 
 
-	get: function (url, withtoken ){				
+	get: function (url, withtoken, showmask ){				
 		withtoken = typeof withtoken !== 'undefined' ? withtoken : true;
-		$.afui.showMask('Processando...');
-		$.afui.blockUI(.2);
+		showmask = typeof showmask !== 'undefined' ? showmask : true;
+
+		if (showmask){
+			$.afui.showMask('Processando...');
+			$.afui.blockUI(.2);
+		}
 		return this.ajax(url,'GET',null, withtoken)
 		.fail(function(e){console.log(e)})
 		.always(function(){
-			$.afui.hideMask();
-			$.afui.unblockUI();
+			if (showmask){
+				$.afui.hideMask();
+				$.afui.unblockUI();
+			}
 		})
 	},
 
@@ -288,8 +296,9 @@ Oauth.prototype ={
 		return d.promise();
 	},
 
-	getManicures: function(){
-		return this.get(this.apiUrlUsuario+"?tipo=M");
+	getManicures: function(all){
+		online = typeof online !== 'undefined' ? online : false;
+		return this.get(this.apiUrlManicures+"/"+all);
 	},
 
 	addCartao : function(data){		
@@ -302,16 +311,17 @@ Oauth.prototype ={
 	},
 
 	getagendamentoCliente : function(cliente_id){		
-		return this.get(this.agendamentoURL+'?cliente_id='+cliente_id+'&fields=id,data_hora,manicure_id,total,status&sort=data_hora&order=desc');
+		return this.get(this.agendamentoURL+'?cliente_id='+cliente_id+'&fields=id,data_hora,manicure_id,total,servicos,status&sort=data_hora&order=desc');
 	},
 	
 	getagendamentoManicure: function(manicure_id){		
-		return this.get(this.agendamentoURL+'?manicure_id='+manicure_id+'&fields=id,data_hora,manicure_id,total,status&sort=data_hora&order=desc');
+		return this.get(this.agendamentoURL+'?manicure_id='+manicure_id+'&fields=id,data_hora,manicure_id,total,servicos,status&sort=data_hora&order=desc');
 	},
 	
 	getagendamentoId : function(id){		
 		return this.get(this.agendamentoURL+'/'+id);
 	}, 
+	
 	agendar : function(data){
 		return this.post(this.agendarURL,data)
 	},
@@ -323,11 +333,19 @@ Oauth.prototype ={
 
 	updateGeoLocation: function(id,lat,lng){
 		var data={'id':id,'latitude':lat,'longitude':lng}
-		return this.post(this.apiUrlGeoposition,data,true,false);
+		if (!this.isExpired()){
+			return this.post(this.apiUrlGeoposition,data,true,false);
+		}
 	},
 
 	getGeolocations: function(){
-		return this.get(this.apiUrlUsuario+'?tipo=M&fields=id,latitude,longitude');
+		if (!this.isExpired()){
+			return this.get(this.apiUrlGeoposition,true,false);
+		}
+	},
+
+	push: function(data){
+		return this.post(this.apiUrlPush,data,true,false);
 	}
 
 }

@@ -1,3 +1,52 @@
+var ManicureMarks= function(map){
+    this.map=map;
+    this.markers = [];
+
+    this.addMarker = function(location) {       
+        var that=this;
+        var marker = new google.maps.Marker({
+           position: location,
+            map: that.map,
+            icon: {url:'images/pin-nailnow.png',anchor:{x:14,y:14}},
+        });
+        this.markers.push(marker);
+    }
+
+    /*
+    this.addMarker = function(location) {
+        var that=this;
+        var markerOptions={
+           position: location,
+           icon: {url:'images/pin-nailnow.png'}
+        };
+
+        function onMarkerAdded(marker) {
+            that.markers.push(marker);
+            marker.setIconAnchor(14,14);
+        }
+
+        that.map.addMarker(markerOptions, onMarkerAdded);
+    }
+    */
+    this.setMapOnAll = function(map) {
+        for (var i = 0; i < this.markers.length; i++) {
+            this.markers[i].setMap(map);
+        }
+    }
+
+    this.clearMarkers = function() {
+        this.setMapOnAll(null);
+    }
+
+    this.showMarkers = function() {
+        this.setMapOnAll(this.map);
+    }
+
+    this.deleteMarkers = function() {
+        this.clearMarkers();
+        this.markers = [];
+    }
+}
 
 var Map_cliente = function(){
     this.map=null;
@@ -6,42 +55,46 @@ var Map_cliente = function(){
     this.myMarker=null;
     this.watchID=null;
     this.coordenadas=null;
-    this.geocoder=null;   
+    this.geocoder=null;
+    this.manicureMarks;
+
     this.canvas = 'map-canvas';
-    this.options={'searchBox':true,'locationButton':true,'watchPosition':true}
+    this.options={'searchBox':true,'locationButton':true,'watchPosition':true,'watchManicuresPositon':true}
 
     this.initMap = function() {
         console.log('init map');
         var that=this;        
         this.geocoder= new google.maps.Geocoder();
-        this.myLatLng = new google.maps.LatLng(-18.9064, -41.9666);        
+        this.myLatLng = new google.maps.LatLng(-18.9064, -41.9666);  
+
         this.map = new google.maps.Map(document.getElementById(this.canvas), {
             zoom: 3,
             center: that.myLatLng,
             disableDefaultUI: true
         });            
         
+        this.manicureMarks = new ManicureMarks(this.map);    
+        
         $(document).on('pagechange', function(){
-            google.maps.event.trigger(that.map,'resize');
+             google.maps.event.trigger(that.map,'resize');
         });
-
+        
         document.addEventListener("deviceready",this.calldialogGPS);
         if (this.options.searchBox) this.add_search_box();
 
+        
         this.myMarker = new google.maps.Marker({
             map: this.map,
             icon: {url:'images/ic_my_location_1x_24dp.png',anchor:{x:14,y:14}},
             animation: google.maps.Animation.DROP,
         });
         
-        if (this.options.locationButton) this.addYourLocationButton();
-        
-        if (this.options.watchPosition) 
-            this.watchPosition({accuracy:true},function(r){
-                $oauth.updateGeoLocation(user.current.id,r.lat.toString(),r.lng.toString());
-                that.myMarker.setPosition(r)
-            },this.calldialohGPS);
-        
+        if (this.options.locationButton) this.addYourLocationButton();      
+
+        if (this.options.watchPosition) this.startWatch();
+
+        if (this.options.watchManicuresPositon) this.startWatchManicure();            
+
         google.maps.event.addListener(this.map, 'dragstart', function() {
             that.hide_map_panel();       
         });                                
@@ -151,9 +204,19 @@ var Map_cliente = function(){
         input.class = 'controls';
         input.type='text';
         input.placeholder='Box de Pesquisa';
-
+        
         var searchBox = new google.maps.places.SearchBox(input);
         map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+        input.addEventListener('focusout', function() {
+            that.show_map_panel();
+            google.maps.event.trigger(that.map,'resize');
+            console.log("focusout");
+        });
+
+        input.addEventListener('focus', function() {
+            that.hide_map_panel();
+            console.log("focus");
+        });
         // Bias the SearchBox results towards current map's viewport.
         map.addListener('bounds_changed', function() {
             searchBox.setBounds(map.getBounds());
@@ -205,7 +268,7 @@ var Map_cliente = function(){
     }
 
     this.show_map = function(){   
-        this.show_map_panel();        
+        this.show_map_panel();
         $.afui.loadContent("#mapa",false,false,"slide");     
         this.centerCurrentLocation();    
     }
@@ -263,11 +326,30 @@ var Map_cliente = function(){
         }
     }
 
+    this.startWatch = function(){
+        var that=this;
+        this.watchPosition({accuracy:true},function(r){
+            $oauth.updateGeoLocation(user.current.id,r.lat.toString(),r.lng.toString());
+            that.myMarker.setPosition(r)
+        },this.calldialohGPS);
+    }
+
     this.stopWatch = function(){
         if(this.watchID){
           navigator.geolocation.clearWatch(this.watchID);
         }else{
           console.log("nao esta assistindo a posição");
+        }
+    }
+
+    this.startWatchManicure = function(){
+        this.stopWatchManicure();
+        this.intervalID = window.setInterval(this.updateManicureMarks, 5000);
+    }
+
+    this.stopWatchManicure = function(){
+        if(this.intervalID){
+            clearInterval(this.intervalID);
         }
     }
 
@@ -300,7 +382,7 @@ var Map_cliente = function(){
                 if(that.coordenadas && that.coordenadas.lat && that.coordenadas.lng){
                   if( that.coordenadas.lat != lat ||  that.coordenadas.lng != lng){
                     that.coordenadas = ret;
-                    console.log("pegou posição - ",position);
+                   // console.log("pegou posição - ",position);
                     success(retOri);
                   }else{
                     console.log('não alterou a posição');
@@ -318,6 +400,45 @@ var Map_cliente = function(){
             posOptions
         );
     }
+
+    this.updateManicureMarks = function(){
+       //console.log('escutando');
+        $oauth.getGeolocations()        
+        .done(function(r){
+            map_cliente.manicureMarks.deleteMarkers();            
+            r.locations.forEach(function(l){
+                var position =new google.maps.LatLng(l.latitude,  l.longitude);
+                console.log(l.id,position.lat(),position.lng(),l.timestamp);
+                map_cliente.manicureMarks.addMarker(position);
+            })
+        })
+        .fail(function(response){
+            if($oauth.isExpired())  this.stopWatchManicure();
+        });
+        map_cliente.manicureMarks.showMarkers();        
+    }
+
+    
+    this.tracaRota = function(lat,lng){
+        var directionsService = new google.maps.DirectionsService;
+        var directionsDisplay = new google.maps.DirectionsRenderer;        
+        directionsDisplay.setMap(this.map);
+        $("#map-route p").html(order.endereco);
+        $("#map-route").css('top','0px');
+        directionsService.route({
+            origin: this.myLatLng,
+            destination: new google.maps.LatLng(lat, lng),
+            travelMode: google.maps.TravelMode.DRIVING
+        }, function(response, status) {
+            console.log('direction',response);
+            if (status === google.maps.DirectionsStatus.OK) {
+                directionsDisplay.setDirections(response);
+            } else {
+                window.alert('Directions request failed due to ' + status);
+            }
+        });
+    }
+
     return this;
 }
 
@@ -325,6 +446,8 @@ var  Map_manicure = function(){
     this.canvas='map-canvas2';
     this.options.searchBox=false;
     this.options.watchPosition=true;
+    this.options.watchManicuresPositon=false;
+    this.online=false;    
     this.show_map = function(){   
         //this.show_map_panel();        
         $.afui.loadContent("#mapa",false,false,"slide");     
@@ -334,7 +457,7 @@ var  Map_manicure = function(){
     this.show_map_panel = function(){}
     this.hide_map_panel = function(){}    
     this.update_address_bar = function(){}
-    this.start_pbar = function (){
+    this.startProgressBar = function (){
         var intObj = {
                 template: 3, 
                 parent: '#map-canvas2'
@@ -343,8 +466,57 @@ var  Map_manicure = function(){
         this.indeterminateProgress.start();    
     }
 
-    this.stop_pbar = function (){
+    this.stopProgressBar = function (){
         if (this.indeterminateProgress) this.indeterminateProgress.end();
+    }
+
+    this.startWatch = function(){
+        this.bgGeo();
+        /*
+        var that=this;        
+        this.watchPosition({accuracy:true},function(r){
+            //console.log('updateGeoLocation',r.lat.toString(),r.lng.toString());
+            if(that.online) 
+                $oauth.updateGeoLocation(user.current.id,r.lat.toString(),r.lng.toString());
+            that.myLatLng = new google.maps.LatLng(r.lat, r.lng);
+            that.myMarker.setPosition(r);
+        },this.calldialohGPS);
+        */
+    }
+
+    this.bgGeo = function(){
+        var callbackFn = function(location) {
+            console.log('[js] BackgroundGeolocation callback:  ' + location.latitude + ',' + location.longitude);
+
+            // Do your HTTP request here to POST location to your server.
+            // jQuery.post(url, JSON.stringify(location));
+
+            /*
+            IMPORTANT:  You must execute the finish method here to inform the native plugin that you're finished,
+            and the background-task may be completed.  You must do this regardless if your HTTP request is successful or not.
+            IF YOU DON'T, ios will CRASH YOUR APP for spending too much time in the background.
+            */
+            backgroundGeolocation.finish();
+        };
+
+        var failureFn = function(error) {
+            console.log('BackgroundGeolocation error');
+        };
+
+        // BackgroundGeolocation is highly configurable. See platform specific configuration options
+        backgroundGeolocation.configure(callbackFn, failureFn, {
+            desiredAccuracy: 0,
+            stationaryRadius: 0,
+            distanceFilter: 0,
+            debug: true,
+            interval: 6000
+        });
+
+        // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.
+        backgroundGeolocation.start();
+
+        // If you wish to turn OFF background-tracking, call the #stop method.
+        // backgroundGeolocation.stop();  
     }
 
     return this;

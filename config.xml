@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="co.nailnow.app" version="0.1.15" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.01">
+<widget id="co.nailnow.app" version="0.1.21" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.01">
     <name>Nailnow</name>
     <description>
         Manicure a qualquer hora.
@@ -9,7 +9,6 @@
     </author>
     <content src="index.html" />
     <plugin name="cordova-plugin-whitelist" spec="1" />
-    
     <access origin="*" />
     <access origin="cdvfile://*" />
     <allow-intent href="http://*/*" />
@@ -21,16 +20,14 @@
     <allow-intent href="google.streetview:*" />
     <allow-intent href="google.navigation:*" />
     <allow-intent href="cdvfile://*" />
-    
     <preference name="phonegap-version" value="cli-6.1.0" />
-    <preference name="android-minSdkVersion" value="15" />
     <preference name="android-targetSdkVersion" value="21" />
     <preference name="android-installLocation" value="auto" />
     <preference name="orientation" value="portrait" />
     <preference name="android-build-tool" value="gradle" />
     <preference name="SplashScreenDelay" value="3000" />
-    <preference name="FadeSplashScreen" value="false"/>
-    <preference name="ShowSplashScreenSpinner" value="false"/>
+    <preference name="FadeSplashScreen" value="false" />
+    <preference name="ShowSplashScreenSpinner" value="false" />
     <icon src="icon.png" />
     <splash src="images/720x960.png" />
     <platform name="android">
@@ -47,25 +44,47 @@
             <param name="android-package" value="nl.xservices.plugins.SocialSharing" />
         </feature>
     </platform>
-
     <platform name="ios">
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
         <preference name="deployment-target" value="7.1" />
-        <splash src="images/320x480.png" width="320" height="480"/>
-        <icon height="180" src="images/icon-60@3x.png" width="180" />
-        <icon height="120" src="images/icon-60@2x.png" width="120" />
+        <icon height="180" src="images/AppIcon60x60@3x.png" width="180" />
+        <icon height="60" src="images/AppIcon60x60.png" width="60" />
+        <icon height="120" src="images/AppIcon60x60@2x.png" width="120" />
+        <icon height="76" src="images/AppIcon76x76.png" width="76" />
+        <icon height="152" src="images/AppIcon76x76@2x.png" width="152" />
+        <icon height="40" src="images/AppIcon40x40.png" width="40" />
+        <icon height="80" src="images/AppIcon40x40@2x.png" width="80" />
+        <icon height="57" src="images/AppIcon57x57.png" width="57" />
+        <icon height="114" src="images/AppIcon57x57@2x.png" width="114" />
+        <icon height="72" src="images/AppIcon72x72.png" width="72" />
+        <icon height="144" src="images/AppIcon72x72@2x.png" width="144" />
+        <icon height="29" src="images/AppIcon29x29.png" width="29" />
+        <icon height="58" src="images/AppIcon29x29@2x.png" width="58" />
+        <icon height="50" src="images/AppIcon50x50.png" width="50" />
+        <icon height="100" src="images/AppIcon50x50@2x.png" width="100" />
+        <splash height="480" src="images/LaunchImage320x480.png" width="320" />
+        <splash height="960" src="images/LaunchImage320x480@2x.png" width="640" />
+        <splash height="1024" src="images/LaunchImage768x1024.png" width="768" />
+        <splash height="2048" src="images/LaunchImage-700-Portrait@2x~ipad.png" width="1536" />
+        <splash height="768" src="images/LaunchImage-700-Landscape~ipad.png" width="1024" />
+        <splash height="1536" src="images/LaunchImage-700-Landscape@2x~ipad.png" width="2048" />
+        <splash height="1136" src="images/LaunchImage-700-568h@2x.png" width="640" />
+        <splash height="1334" src="images/LaunchImage-800-667h@2x.png" width="750" />
+        <splash height="2208" src="images/LaunchImage-800-Portrait-736h@3x.png" width="1242" />
+        <splash height="1242" src="images/LaunchImage-800-Landscape-736h@3x.png" width="2208" />
         <feature name="SocialSharing">
             <param name="ios-package" value="SocialSharing" />
         </feature>
         <preference name="StatusBarOverlaysWebView" value="false" />
     </platform>
-
     <plugin source="git" spec="https://github.com/Initsogar/cordova-webintent.git" />
     <plugin name="cordova-plugin-keepe-cardio" source="npm" />
     <plugin name="cordova-plugin-app-version" source="npm" />
     <plugin name="cordova-plugin-background-mode" />
     <plugin name="cordova-plugin-device" source="npm" />
+    <plugin name="cordova-plugin-camera" source="npm" />
+    <plugin name="cordova-plugin-file-transfer" source="npm" />
     <plugin name="cordova-plugin-dialogs" source="npm" />
     <plugin name="cordova-plugin-geolocation" source="npm" />
     <plugin name="cordova-plugin-network-information" source="npm" />
@@ -76,22 +95,24 @@
     <plugin source="git" spec="https://github.com/Viras-/cordova-plugin-powermanagement.git" />
     <plugin name="cordova-plugin-x-socialsharing" source="npm" />
     <plugin name="cordova-plugin-inappbrowser" source="npm" />
-    <plugin source="git" spec="https://github.com/rodrigo-martinezd/cordova-dialog-gps.git" />
-
+    <plugin name="cordova-background-geolocation-lt" source="npm" />
     <plugin name="phonegap-plugin-push" source="npm">
         <param name="SENDER_ID" value="499027471276" />
     </plugin>
-
     <plugin name="cordova-plugin-facebook4" spec="~1.7.1">
         <param name="APP_ID" value="537031369755381" />
         <param name="APP_NAME" value="nailnow" />
     </plugin>
-
     <plugin name="cordova-plugin-digits">
         <param name="FABRIC_API_KEY" value="a6edd807a9ceac315bb2097e2c1bd6667494503f" />
         <param name="FABRIC_CONSUMER_KEY" value="N7i5DK56Vi4Fc5kM5D2cVaexn" />
         <param name="FABRIC_CONSUMER_SECRET" value="9mup6ex8xJpYqz4CRryzHI2NVdlAOVdHR76SHyVKAWGYiAVt79" />
         <param name="PACKAGE_NAME" value="co.nailnow.app" />
     </plugin>
-
+    <plugin name="uk.co.workingedge.phonegap.plugin.launchnavigator" source="npm" />
+    <plugin name="cordova-plugin-crosswalk-webview" source="npm" />
+    <plugin name="cordova-plugin-googlemaps" source="npm" >
+        <param name="API_KEY_FOR_ANDROID" value="AIzaSyD52ypHD6_XH-vQEZkF69jMRrowUZT_sPE" />
+        <param name="API_KEY_FOR_IOS" value="AIzaSyA7ANNfLad4n7GXH4-Q6QLeuLpmsQYIcVM" />
+    </plugin>
 </widget>

@@ -53,7 +53,7 @@
         });
     </script>
     
-    <script type="application/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCw-1K3hDJDFhDnujklziKhIVNbLFdjIfk&amp;libraries=places&amp;signed_in=false"></script>
+    <script type="application/javascript" src="https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyCw-1K3hDJDFhDnujklziKhIVNbLFdjIfk&amp;libraries=places&amp;signed_in=false"></script>
     <script type="application/javascript" src="js/rest-of-space.js"></script>
     <script type="application/javascript" src="lib/datetimepicker/jquery.datetimepicker.full.js"></script>
     
@@ -141,7 +141,7 @@
             <div id="login" class="upage-content vertical-col hidden panel" data-title="Login" data-header="af-header-0" data-footer="login-footer">
                 <div class="grid grid-pad urow uib_row_2 row-height-2" data-uib="layout/row" data-ver="0">
                     <div class="col uib_col_2 col-0_12-12" data-uib="layout/col" data-ver="0">
-                        <form id="frm-login" action="#">
+                        <form id="frm-login" action="#" onsubmit="return do_frm_login()">
                             <div class="widget-container content-area vertical-col">
 
                                 <p class="d-margins widget center background-line" data-ver="0">
@@ -156,14 +156,14 @@
                                 <div class="table-thing with-label widget uib_w_8 input" data-uib="app_framework/input" data-ver="1">
                                     <label class="narrow-control label-top-left">EMAIL</label>
 
-                                    <input class="wide-control" placeholder="email" type="text" name="login_email" id="login_email">
+                                    <input class="wide-control" placeholder="email" type="text" name="login_email" id="login_email" data-dependency="#login_senha">
                                 </div>
                                 <div class="table-thing with-label widget uib_w_9" data-uib="app_framework/input" data-ver="1">
                                     <label class="narrow-control label-top-left">SENHA</label>
 
                                     <input class="wide-control" placeholder="senha" type="password" name="login_senha" id="login_senha">
                                 </div>
-                                <a class="button d-margins btn-pink btn-padding" id="btn-login2">LOGIN</a>
+                                <input type=submit class="button d-margins btn-pink btn-padding" id="btn-login2" value="LOGIN">
                                 <span class="uib_shim"></span>
                             </div>
                         </form>
@@ -191,7 +191,7 @@
             r="af-header-0" data-footer="none">
                 <div class="grid grid-pad urow uib_row_3 row-height-3" data-uib="layout/row" data-ver="0">
                     <div class="col uib_col_3 col-0_12-12" data-uib="layout/col" data-ver="0">
-                        <form id="frm-registrar" action="#">
+                        <form id="frm-registrar" action="#" onsubmit="return do_frm_registrar()">
                         <div class="widget-container content-area vertical-col">
 
                             <a class="button d-margins btn-facebook btn-padding" id="btn-facebook-registrar">CADASTRAR COM O FACEBOOK</a>
@@ -200,28 +200,28 @@
                             </p>                                    
                             <div class="table-thing with-label widget uib_w_13" data-uib="app_framework/input" data-ver="1">
                                 <label class="narrow-control label-top-left" for="reg_nome">NOME</label>
-                                <input class="wide-control" placeholder="Nome" type="text" name="reg_nome" id="reg_nome" required>
+                                <input class="wide-control" placeholder="Nome" type="text" name="reg_nome" id="reg_nome" required data-dependency="#reg_email">
                             </div>
                             <div class="table-thing with-label widget uib_w_14" data-uib="app_framework/input" data-ver="1">
                                 <label class="narrow-control label-top-left" for="reg_email">EMAIL</label>
-                                <input class="wide-control" placeholder="nome@exemplo.com" type="email" name="reg_email" id="reg_email" required>
+                                <input class="wide-control" placeholder="nome@exemplo.com" type="email" name="reg_email" id="reg_email" required data-dependency="#reg_senha">
                             </div>
 
-                            <div class="table-thing with-label widget uib_w_14" data-uib="app_framework/input" data-ver="1">
+                            <!--div class="table-thing with-label widget uib_w_14" data-uib="app_framework/input" data-ver="1">
                                 <label class="narrow-control label-top-left" for="reg_telefone">CELULAR</label>
                                 <input class="wide-control" placeholder="Seu telefone com DDD" type="tel" name="reg_telefone" id="reg_telefone" required>
-                            </div>
+                            </div -->
 
                             <div class="table-thing with-label widget uib_w_16" data-uib="app_framework/input" data-ver="1">
                                 <label class="narrow-control label-top-left" for="reg_senha">SENHA</label>
-                                <input class="wide-control" placeholder="no minimo 8 caracteres" type="password" name="reg_senha" id="reg_senha">
+                                <input class="wide-control" placeholder="no minimo 8 caracteres" type="password" name="reg_senha" id="reg_senha" data-dependency="#reg_confirme_senha">
                             </div>
                             <div class="table-thing with-label widget uib_w_17" data-uib="app_framework/input" data-ver="1">
                                 <label class="narrow-control label-top-left" for="reg_confirme_senha">CONFIRME A SENHA</label>
                                 <input class="wide-control" placeholder="confirme a senha" type="password" name="reg_confirme_senha" id="reg_confirme_senha" >
                             </div>
 
-                            <a class="button d-margins btn-pink btn-padding" data-uib="app_framework/button" data-ver="1" id="btn-registrou" data-page-type="document_page" data-transition="slide">REGISTRAR</a>
+                            <input type="submit" value="REGISTRAR" class="button d-margins btn-pink btn-padding" data-uib="app_framework/button" data-ver="1" id="btn-registrou" data-page-type="document_page" data-transition="slide">
                             <span class="uib_shim"></span>
                             <span class="uib_shim"></span>
                             <p> Ao finalizar esse processo, você sinaliza que leu e concordou com nossos <a href="#" class="btn-termos-uso">termos de uso</a>.</p>
@@ -294,35 +294,35 @@
                             <h1><i class="fa fa-map-marker fa-1x" aria-hidden="true"></i>Endereço de atendimento</h1>
                             
                             <div class="col col3-4">
-                                <input class="wide-control" placeholder="Endereço" type="text" id="conf_endereco" name="conf_endereco" required>
+                                <input class="wide-control" placeholder="Endereço" type="text" id="conf_endereco" name="conf_endereco" required data-dependency="#conf_numero">
                             </div>
                             <div class="col last col1-4 last">
-                                <input class="wide-control" placeholder="Numero" type="number" id="conf_numero" name="conf_numero" required>
+                                <input class="wide-control" placeholder="Numero" type="number" id="conf_numero" name="conf_numero" required data-dependency="#conf_complemento">
                             </div>
                                                     
                             <div class="col col2-4">
-                                <input class="wide-control" placeholder="Complemento" type="text" id="conf_complemento">
+                                <input class="wide-control" placeholder="Complemento" type="text" id="conf_complemento" data-dependency="#conf_bairro">
                             </div>
 
                             <div class="col col2-4 last">
-                                <input class="wide-control" placeholder="Bairro" type="text" id="conf_bairro" name="conf_bairro" required>
+                                <input class="wide-control" placeholder="Bairro" type="text" id="conf_bairro" name="conf_bairro" required data-dependency="#conf_cidade">
                             </div>
 
                             <div class="col col2-4">
-                                <input class="wide-control" placeholder="Cidade" type="text" id="conf_cidade" name="conf_cidade" required>
+                                <input class="wide-control" placeholder="Cidade" type="text" id="conf_cidade" name="conf_cidade" required data-dependency="#conf_uf">
                             </div>
 
                             <div class="col col2-4 last">
-                                <input class="wide-control" placeholder="UF" type="text" id="conf_uf" maxlength=2 name="conf_uf" required>
+                                <input class="wide-control" placeholder="UF" type="text" id="conf_uf" maxlength=2 name="conf_uf" required data-dependency="#conf_cep">
                             </div>
 
                             <div class="grid urow">
                                 <div class="col col2-4">
-                                <input class="wide-control" placeholder="CEP" data-mask="00000-000" title="Informe o CEP no formato 99999-999" type="text" name="conf_cep" id="conf_cep" minlength=9 required>
+                                <input class="wide-control" placeholder="CEP" data-mask="00000-000" title="Informe o CEP no formato 99999-999" type="text" name="conf_cep" id="conf_cep" minlength=9 required data-dependency="#conf_telefone">
                                 </div>
 
                                 <div class="col col2-4 last">
-                                <input class="wide-control" placeholder="Telefone de Contato" type="tel" id="conf_telefone" name="conf_telefone" required>
+                                <input class="wide-control" placeholder="Telefone de Contato" type="tel" id="conf_telefone" name="conf_telefone" required >
                                 </div>
                             </div>
 
@@ -440,9 +440,7 @@
             </div>
 
             <!-- confirmação selecione hora-->
-            <div class="panel"  data-title="Escolha um Horário" id="selecionar-hora">               
-                                
-            </div>
+            <div class="panel"  data-title="Escolha um Horário" id="selecionar-hora"></div>
 
             <!-- confirmação resumo-->
             <div class="panel" data-title="Resumo" id="confirmacao-resumo">
@@ -487,17 +485,17 @@
                 <form id="frm-add-cartao" action="#">
                     <div class="grid grid-pad urow vertical-col">
                         <div class="col">
-                            <input class="wide-control" type="text" id="holder_name" name="holder_name" placeholder="Nome do titular como esta no cartão">
+                            <input class="wide-control" type="text" id="holder_name" name="holder_name" placeholder="Nome do titular como esta no cartão" data-dependency="#card_number">
                         </div>
 
                         <div class="col col3-4">
-                            <input class="wide-control" type="number" id="card_number" name="card_number" placeholder="Numero do cartão de crédito">
+                            <input class="wide-control" type="number" id="card_number" name="card_number" placeholder="Numero do cartão de crédito" data-dependency="#card_expiration">
                         </div>
                         <div class="col last col1-4">
                             <a class="button icon camera btn-pink" id="btn_digitalizar"></a>
                         </div>
                         <div class="col col2-3">
-                            <input type="text" id="card_expiration" name="card_expiration" data-mask="99/9999" placeholder="MM/AAAA">
+                            <input type="text" id="card_expiration" name="card_expiration" data-mask="99/9999" placeholder="MM/AAAA" data-dependency="#card_cvv">
                         </div>
                         
                         <div class="col last col1-3">
@@ -511,6 +509,7 @@
             
             <!-- Editar Conta -->
             <div class="upage-content vertical-col left panel ac0" id="editar_conta" data-header="af-header-1" data-title="Editar Conta">
+                <div class="profile-picture" ><img src="images/no-user-image.png" width=70></div>
                 <div class="grid grid-pad urow uib_row_10 row-height-10" data-uib="layout/row" data-ver="0">
                     <div class="col uib_col_17 col-0_12-12" data-uib="layout/col" data-ver="0">
                         <div class="widget-container content-area vertical-col">
@@ -593,11 +592,11 @@
                         <div class="col uib_col_13 single-col" data-uib="layout/col" data-ver="0">
                             <div class="widget-container content-area vertical-col">
                                 <div class="sidemenu-header">
-                                    <img src="images/no-user-image.png" id="userimg">
+                                    <img src="images/no-user-image.png" class="userimg">
                                     <div class="name">
-                                        <span id="username">fulano de Tal</span>
+                                        <span class="username">fulano de Tal</span>
                                         <br>
-                                        <span id="useremail">Email@site.com</span>
+                                        <span class="useremail">Email@site.com</span>
                                     </div>
                                     <span class="uib_shim"></span>
                                 </div>
@@ -612,7 +611,7 @@
                                     </li>
                                     <li class="widget uib_w_53" data-uib="app_framework/listitem" data-ver="2"><a class="btn-termos-uso"><i class="fa fa-file-text" ></i>&nbsp; Termos de Uso</a>
                                     </li>
-                                    <li class="widget uib_w_53" data-uib="app_framework/listitem" data-ver="2"><a id="btn-sair"><i class="fa fa-sign-out"></i>&nbsp; Sair</a>
+                                    <li class="widget uib_w_53" data-uib="app_framework/listitem" data-ver="2"><a class="btn-sair"><i class="fa fa-sign-out"></i>&nbsp; Sair</a>
                                     </li>
                                 </ul>
                             </div>
@@ -636,11 +635,19 @@
         <div class="pages">
             <!-- manicure -->
             <div class="upage-content vertical-col left panel" id="manicure" data-title=" " data-header="af-header-2" data-footer="none">
+                <div id="map-route" class="urow">
+                    <div class="col col3-4">
+                        <p>Rua sobe e desce, 100 - Centro Governador Valadares - MG</p>
+                    </div>
+                    <div class="col col1-4 last">
+                        <a id="btn-map-route" class="button btn-black"><i class="fa fa-2x fa-chevron-up"></i>Navegar</a>
+                    </div>
+                </div>
                 <div id="map-canvas2" data-uib="media/google_maps"></div>
             </div>
 
             <!-- manicure-calendar -->
-            <div class="upage-content vertical-col left panel" id="manicure-calendar" data-title="Calendario" data-header="af-header-2" data-footer="none">
+            <div class="upage-content vertical-col left panel" id="manicure-calendar" data-title="Agenda" data-header="af-header-2" data-footer="none">
                 <div class="grid grid-pad urow uib_row_10 row-height-10" data-uib="layout/row" data-ver="0">
                     <div class="col uib_col_17 col-0_12-12" data-uib="layout/col" data-ver="0">
                     <div class="vcenter-historico">Agenda Vazia.<br>Seus atendimentos serão listados aqui.</div>
@@ -649,7 +656,7 @@
             </div>
 
             <!-- manicure-calendar-detail -->
-            <div class="panel" id="manicure-calendar-detail" data-title="Calendario" data-header="af-header-2" data-footer="none">
+            <div class="panel" id="manicure-calendar-detail" data-title="Agenda" data-header="af-header-2" data-footer="none">
                 <div class="vertical-col grid grid-pad">
                     <p class="formGroupHead">Detalhes do Pedido</p>
                     <div class="urow input-group vertical-col">
@@ -685,28 +692,47 @@
                     <div id="countdown"></div>
                     <div>
                         <center>
-                        <p>Rua sobe e desce n 123<br>
-                        Governador Valadares - MG</p>
+                        <p id="cronometro-endereco"></p>
                         </center>
                     </div>
                     
                     <div class="urow vertical-col">
-                        <a class="button d-margins btn-pink pressed" data-uib="app_framework/button" data-ver="1" id="btn-registrou" data-page-type="document_page" data-transition="slide">ACEITAR</a>
+                        <a class="button d-margins btn-pink" data-uib="app_framework/button" data-ver="1" id="btn-cronometro-aceitar" data-page-type="document_page" data-transition="slide">ACEITAR</a>
                     </div>
 
                     <div class="urow vertical-col">
-                        <a class="button d-margins btn-black pressed" data-uib="app_framework/button" data-ver="1" id="btn-registrou" data-page-type="document_page" data-transition="slide">RECUSAR</a>
+                        <a class="button d-margins btn-black" data-uib="app_framework/button" data-ver="1" id="btn-cronometro-recusar" data-page-type="document_page" data-transition="slide">RECUSAR</a>
                     </div>
                 </div>
             </div>
 
+            <!-- manicure-cronometro -->
+            <div class="upage-content panel" id="manicure-menu">
+                <div class="col uib_col_13 single-col" data-uib="layout/col" data-ver="0">
+                    <div class="widget-container content-area vertical-col">
+                        <div class="sidemenu-header">
+                            <img src="images/no-user-image.png" class="userimg">
+                            <div class="name">
+                                <span class="username">fulano de Tal</span>
+                                <br>
+                                <span class="useremail">Email@site.com</span>
+                            </div>
+                            <span class="uib_shim"></span>
+                        </div>
+                        <ul class="list widget uib_w_48 d-margins" data-uib="app_framework/listview" data-ver="2">
+                            <li class="widget uib_w_53" data-uib="app_framework/listitem" data-ver="2"><a class="btn-sair"><i class="fa fa-sign-out"></i>&nbsp; Sair</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
         </div>
         <footer id="af-footer-2">
-            <button class="button"><i class="fa fa-2x fa-home"></i>Home</button>
+            <button class="button" id="btn-manicure-home"><i class="fa fa-2x fa-home"></i>Home</button>
             <button class="button" id="btn-manicure-calendar"><i class="fa fa-2x fa-calendar"></i>Agenda</button>
             <!--button class="button"><i class="fa fa-2x fa-star"></i>Avaliações</button -->
-            <button class="button"><i class="fa fa-2x fa-user"></i>Conta</button>
+            <button class="button" id="btn-manicure-conta"><i class="fa fa-2x fa-user"></i>Conta</button>
         </footer>
     </div>
 

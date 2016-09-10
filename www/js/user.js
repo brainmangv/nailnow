@@ -6,7 +6,7 @@ function User() {
 		
 		var that=this;
 		var d = $.Deferred();
-		//console.log(type, email, name, password);
+		console.log('user signup',tipo, email, nome, senha);
 		var user = {
 			tipo: tipo,
 			nome: nome,
@@ -20,7 +20,7 @@ function User() {
 		.then(function(response) {
 			that.setCurrentUser()
 				.then(function(response){
-					that.registerPushNotification();
+					that.registerPushNotification0();
 					d.resolve(response);		
 				})
 				.fail(function(response){
@@ -101,13 +101,12 @@ function User() {
 		return d.promise();
 	};
 
-	this.registerPushNotification = function(){
+	this.registerPushNotification0 = function(){
 		var appVersion;
 		var d = $.Deferred();
 		var that=this;
 		if (typeof cordova !== 'undefined'){
 			cordova.getAppVersion().done(function(v){console.log(v);appVersion=v});
-			
 			var push = PushNotification.init({
 			    android: {
 			        senderID: "499027471276"
@@ -157,31 +156,48 @@ function User() {
 
 			push.on('notification', function(data) {
 			    console.log('push notificaton',data);
-				if (data.additionalData.tipo =='agendamento_agora') manicure_cronometro();
+				if (data.additionalData.tipo =='agendamento_agora') {
+					order.endereco=data.additionalData.endereco;
+					order.cliente_id=data.additionalData.cliente_id;
+					order.lat=data.additionalData.lat;
+					order.lng=data.additionalData.lng;
+					$("#cronometro-endereco").html(order.endereco);					
+					if (data.additionalData.foreground)						
+						manicure_cronometro()
+					else
+						toForeground('MainActivity', 'co.nailnow.app', function(){manicure_cronometro()}, null);
+						
+				}else if (data.additionalData.tipo =='agendamento_agora_aceito') {
+					$.afui.hideMask();
+					$.afui.unblockUI();
+				    $.afui.loadContent('#mapa',false,true);
+					$.afui.toast({message:'A manicure aceitou o seu pedido.',position:'tc'});
+				}
+
 			    //alert(data);
 				// alert($rootScope.badge);
-				/*
-				$rootScope.badge += 1;
-				$rootScope.$apply();
+				
+				// $rootScope.badge += 1;
+				// $rootScope.$apply();
 
-				$ionicPopup.alert({
-					title: 'Notificação',
-					content: data.message, 
-					buttons: [
-						{
-							text: '<b>OK</b>',
-							type: 'button-positive',
-							onTap: function(e) {
-								if ($rootScope.$storage.manicury_type == "C"){
-									$state.go('customers.notifications');
-								} else {
-									$state.go('professionals.notifications');
-								}
-							}
-						}
-					]
-				});
-				*/
+				// $ionicPopup.alert({
+				// 	title: 'Notificação',
+				// 	content: data.message, 
+				// 	buttons: [
+				// 		{
+				// 			text: '<b>OK</b>',
+				// 			type: 'button-positive',
+				// 			onTap: function(e) {
+				// 				if ($rootScope.$storage.manicury_type == "C"){
+				// 					$state.go('customers.notifications');
+				// 				} else {
+				// 					$state.go('professionals.notifications');
+				// 				}
+				// 			}
+				// 		}
+				// 	]
+				// });
+				
 			    // data.title,
 			    // data.count,
 			    // data.sound,
@@ -194,6 +210,92 @@ function User() {
 			});
 		}
 		return d.promise();
+	};
+
+	this.registerPushNotification1 = function(){
+		var appVersion;
+		var d = $.Deferred();
+		var that=this;
+		if (typeof cordova !== 'undefined'){
+			cordova.getAppVersion().done(function(v){console.log(v);appVersion=v});
+			FCMPlugin.getToken(
+				function(token){
+					var deviceToken = token;
+					var deviceInformation = {
+						device_token: deviceToken,
+						device_manufacturer: device.manufacturer,
+						device_model: device.model,
+						device_platform: device.platform,
+						device_version: device.version,
+						device_uuid: device.uuid,
+						app_version: appVersion
+					}
+
+					if (that.current.tipo=='C') {
+						FCMPlugin.subscribeToTopic('cliente');
+					}
+					else{
+						FCMPlugin.subscribeToTopic('manicure');
+					}
+					
+					console.log('deviceInformation', JSON.stringify(deviceInformation));
+
+					$oauth.updateUser(that.current.id, deviceInformation)
+					.then(function(response) {
+
+						d.resolve(response);
+
+					})
+					.fail(function(response) {
+						console.log(JSON.stringify(response));
+
+						d.resolve();
+					});
+					console.log('deviceToken', deviceToken);
+				},
+				function(err){
+					console.log('error retrieving token: ' + err);
+				}
+			);
+
+			FCMPlugin.onNotification(
+				function(data){
+					if(data.wasTapped){
+					//Notification was received on device tray and tapped by the user.
+						alert( JSON.stringify(data) );
+					}else{
+					//Notification was received in foreground. Maybe the user needs to be notified.
+						alert( JSON.stringify(data) );
+					}
+				},
+				function(msg){
+					console.log('onNotification callback successfully registered: ' + msg);
+				},
+				function(err){
+					console.log('Error registering onNotification callback: ' + err);
+				}
+			);
+		}
+		return d.promise();
+	};
+
+	this.registerPushNotification2 = function(){
+		try 
+		{ 
+			pushNotification = window.plugins.pushNotification;
+			if (device.platform == 'android' || device.platform == 'Android' ||
+					device.platform == 'amazon-fireos' || device.platform == 'browser') {
+					pushNotification.register(function(result){console.log('success:'+ result );}, function(error){console.log('error:'+ error );}, {"senderID":"499027471276","ecb":"onNotification"});		// required!
+			} else {
+				//pushNotification.register(tokenHandler, errorHandler, {"badge":"true","sound":"true","alert":"true","ecb":"onNotificationAPN"});	// required!
+			}
+		}
+		catch(err) 
+		{ 
+			txt="There was an error on this page.\n\n"; 
+			txt+="Error description: " + err.message + "\n\n"; 
+			alert(txt); 
+		}
 	};
 
 	this.getCurrentUser = function(){
@@ -229,6 +331,7 @@ function User() {
 	 Login the user
 	 */
 	this.login= function (email, password) {
+		console.log('user login:',email,password);
 		var d = $.Deferred();
 		var that=this;		
 		var credentials = {
@@ -239,7 +342,7 @@ function User() {
 		.then(function() {			
 			that.setCurrentUser()
 			.then(function(response){
-				that.registerPushNotification();
+				that.registerPushNotification0();
 				d.resolve(response);
 			})
 			.fail(function(response){
@@ -439,7 +542,7 @@ function User() {
 		var facebook_name = userData.name;
 		var facebook_email = userData.email;
 
-		console.log('facebook Data: ', userData, accessToken);
+		console.log('facebookUserDB: ', userData, accessToken);
 
 		//Verifica se o Facebook ID já está cadastrado na base. Se estiver, gera token
 		$oauth.checkFacebookid(facebookid, accessToken)
@@ -447,7 +550,7 @@ function User() {
 			console.log("response FB: ", response);
 			that.setCurrentUser()
 			.then(function(response){
-				that.registerPushNotification();
+				that.registerPushNotification0();
 				d.resolve(response);
 			})
 			.fail(function(response){
@@ -468,7 +571,7 @@ function User() {
 					//console.log("response FB get ID: ", response);
 					that.setCurrentUser()
 					.then(function(response){
-						that.registerPushNotification();
+						that.registerPushNotification0();
 						d.resolve(response);
 					})
 					.fail(function(response){
@@ -503,7 +606,7 @@ function User() {
 						.then(function(response) {
 							that.setCurrentUser()							
 							.then(function(response){
-								that.registerPushNotification();
+								that.registerPushNotification0();
 								d.resolve(response);
 
 							})
