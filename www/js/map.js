@@ -476,7 +476,7 @@ var  Map_manicure = function(){
         var that=this;
         /*setInterval(function(){              
               $('#you_location_img').css('background-position', imgX+'px 0px');
-          }, 5000);*/
+          }, 5000);
         
         this.watchPosition({accuracy:true},function(r){
             $.afui.toast({message:r.lat.toString()+','+r.lng.toString(),position:'bc'});
@@ -486,14 +486,17 @@ var  Map_manicure = function(){
             that.myLatLng = new google.maps.LatLng(r.lat, r.lng);
             that.myMarker.setPosition(r);
         },this.calldialogGPS);
-        
+        */
     }
 
     this.bgGeo = function(){
+        var that=this;
         var callbackFn = function(location) {
+            $.afui.toast({message:location.latitude.toString()+','+location.longitude.toString(),position:'bc'});
             console.log('[js] BackgroundGeolocation callback:  ' + location.latitude + ',' + location.longitude);
+            that.myMarker.setPosition({lat:location.latitude,lng:location.longitude});
             if(that.online) 
-                $oauth.updateGeoLocation(user.current.id,r.lat.toString(),r.lng.toString());
+                $oauth.updateGeoLocation(user.current.id,location.latitude.toString(),location.longitude.toString());
             // Do your HTTP request here to POST location to your server.
             // jQuery.post(url, JSON.stringify(location));
 
@@ -516,8 +519,8 @@ var  Map_manicure = function(){
             distanceFilter: 0,
             //url: 'http://192.168.1.5:3000/locations',
             locationProvider: backgroundGeolocation.provider.ANDROID_ACTIVITY_PROVIDER,
-            fastestInterval: 500,
-            activitiesInterval: 1000,
+            fastestInterval: 5000,
+            activitiesInterval: 500,
             debug: true,
             interval: 6000
         });
