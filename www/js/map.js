@@ -331,7 +331,7 @@ var Map_cliente = function(){
         this.watchPosition({accuracy:true},function(r){
             $oauth.updateGeoLocation(user.current.id,r.lat.toString(),r.lng.toString());
             that.myMarker.setPosition(r)
-        },this.calldialohGPS);
+        },this.calldialogGPS);
     }
 
     this.stopWatch = function(){
@@ -480,7 +480,7 @@ var  Map_manicure = function(){
                 $oauth.updateGeoLocation(user.current.id,r.lat.toString(),r.lng.toString());
             that.myLatLng = new google.maps.LatLng(r.lat, r.lng);
             that.myMarker.setPosition(r);
-        },this.calldialohGPS);
+        },this.calldialogGPS);
         
     }
 
