@@ -105,7 +105,7 @@ function User() {
 		var appVersion;
 		var d = $.Deferred();
 		var that=this;
-		if (typeof cordova !== 'undefined'){
+		if (typeof cordova !== 'undefined' ){
 			cordova.getAppVersion().done(function(v){console.log(v);appVersion=v});
 			var push = PushNotification.init({
 			    android: {

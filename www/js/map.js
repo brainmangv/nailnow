@@ -7,7 +7,7 @@ var ManicureMarks= function(map){
         var marker = new google.maps.Marker({
            position: location,
             map: that.map,
-            icon: {url:'images/pin-nailnow.png',anchor:{x:14,y:14}},
+            icon: {url:'images/pin-nailnow.png',anchor:{x:14,y:36}},
         });
         this.markers.push(marker);
     }
@@ -402,13 +402,14 @@ var Map_cliente = function(){
     }
 
     this.updateManicureMarks = function(){
-       console.log('escutando');
+       //console.log('escutando');
         $oauth.getGeolocations()        
         .done(function(r){
             map_cliente.manicureMarks.deleteMarkers();            
+            console.log(r.locations[0],r.locations[1]);
             r.locations.forEach(function(l){
                 var position =new google.maps.LatLng(l.latitude,  l.longitude);
-                console.log(l.id,position.lat(),position.lng(),l.timestamp);
+                
                 map_cliente.manicureMarks.addMarker(position);
             })
         })
