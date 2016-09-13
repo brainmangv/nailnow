@@ -472,7 +472,7 @@ var  Map_manicure = function(){
     }
 
     this.startWatch = function(){
-        this.bgGeo();
+        if (window.backgroundGeolocation) this.bgGeo();
         
         var that=this;
         /*setInterval(function(){              
@@ -514,6 +514,7 @@ var  Map_manicure = function(){
         };
 
         // BackgroundGeolocation is highly configurable. See platform specific configuration options
+        
         backgroundGeolocation.configure(callbackFn, failureFn, {
             desiredAccuracy: 0,
             stationaryRadius: 0,

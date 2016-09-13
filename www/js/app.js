@@ -475,8 +475,8 @@
                                 '<div class="col col3-4"><p>&nbsp; Item</p></div>'+
                                 '<div class="col col1-4 vertical-col center"><p>QTD</p></div>'+
                             '</div>';
-                            var servicos= JSON.parse(r['servicos']);
-                            servicos.forEach(function(s){
+                            var servicos= r.servicos ? servicos.JSON.parse(r.servicos): null;
+                            if (servicos) servicos.forEach(function(s){
                                 html+='<div class="col col3-4 "><p class="border-bottom">'+s.descricao+'</p></div>'+
                             '<div class="col col1-4 last vertical-col center"><p class="border-bottom">'+s.qtd+'</p></div>';
                             });
@@ -638,8 +638,8 @@
                                 '<div class="col col3-4"><p>&nbsp; Item</p></div>'+
                                 '<div class="col col1-4 vertical-col center"><p>QTD</p></div>'+
                             '</div>';
-                             var servicos= JSON.parse(r['servicos']);
-                             servicos.forEach(function(s){
+                             var servicos= r.servicos ? servicos.JSON.parse(r.servicos): null;
+                             if (servicos) servicos.forEach(function(s){
                                 html+='<div class="col col3-4 "><p class="border-bottom">'+s.descricao+'</p></div>'+
                                 '<div class="col col1-4 last vertical-col center"><p class="border-bottom">'+s.qtd+'</p></div>';
                             });
@@ -801,14 +801,14 @@
             for (var i=0;i<15;i++){
                 var f= new Date();
                 f.setDate(d.getDate()+i); 
-                $("#selecionar-data ul").append('<li><a data-data="'+f+'">'+f.toLocaleDateString()+' - '+diaDaSemana[f.getDay()]+'</a></li>');
+                $("#selecionar-data ul").append('<li><a data-data="'+f+'">'+f.toLocaleDateString('pt-BR')+' - '+diaDaSemana[f.getDay()]+'</a></li>');
             }
 
             $("#selecionar-data li a").on("click",function(e){            
                 var data =new Date(e.target.dataset.data);
                 var diaDaSemana=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sabádo'];
                 order.data_hora=data;
-                $("#btn-data").html('<i class="fa fa-calendar" aria-hidden="true"></i>&nbsp; '+data.toLocaleDateString()+' - '+diaDaSemana[data.getDay()]);
+                $("#btn-data").html('<i class="fa fa-calendar" aria-hidden="true"></i>&nbsp; '+data.toLocaleDateString('pt-BR')+' - '+diaDaSemana[data.getDay()]);
                 console.log('a',e.target.dataset.data);
                 $.afui.goBack();
             });
@@ -850,7 +850,7 @@
 
                 while(time.getHours()<=17){
                     if (permiteAgendar(time,agenda))
-                        $("#selecionar-hora ul").append('<li><a data-hora="'+time.toLocaleTimeString()+'">'+time.toLocaleTimeString().substring(0,5)+'</a></li>');
+                        $("#selecionar-hora ul").append('<li><a data-hora="'+time.toLocaleTimeString('pt-BR')+'">'+time.toLocaleTimeString('pt-BR').substring(0,5)+'</a></li>');
                     time=new Date(time.getTime() + 30*60000);    
                 }
 
@@ -892,7 +892,7 @@
         //confirmacao-resumo
         $("#confirmacao-resumo").on("panelbeforeload",function(){
             $("#resumo-endereco").html(order.address.formatted_address);
-            $("#resumo-data").html(order.data_hora.toLocaleDateString());
+            $("#resumo-data").html(order.data_hora.toLocaleDateString('pt-BR'));
             $("#resumo-hora").html(order.data_hora.getHours()+':'+('00'+(+order.data_hora.getMinutes())).slice(-2)
             );
             

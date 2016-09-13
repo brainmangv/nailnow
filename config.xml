@@ -32,14 +32,14 @@
     <splash src="images/720x960.png" />
     <platform name="android">
         <allow-intent href="market:*" />
-        <icon density="ldpi" height="36" src="www/images/36x36.png" width="36" />
-        <icon density="mdpi" height="48" src="www/images/48x48.png" width="48" />
-        <icon density="hdpi" height="72" src="www/images/72x72.png" width="72" />
-        <icon density="xhdpi" height="96" src="www/images/96x96.png" width="96" />
-        <splash density="ldpi" height="426" orientation="portrait" src="www/images/320x426.png" width="320" />
-        <splash density="mdpi" height="470" orientation="portrait" src="www/images/320x470.png" width="320" />
-        <splash density="hdpi" height="640" orientation="portrait" src="www/images/480x640.png" width="480" />
-        <splash density="xhdpi" height="960" orientation="portrait" src="www/images/720x960.png" width="720" />
+        <icon density="ldpi" height="36" src="images/36x36.png" width="36" />
+        <icon density="mdpi" height="48" src="images/48x48.png" width="48" />
+        <icon density="hdpi" height="72" src="images/72x72.png" width="72" />
+        <icon density="xhdpi" height="96" src="images/96x96.png" width="96" />
+        <splash density="ldpi" height="426" orientation="portrait" src="images/320x426.png" width="320" />
+        <splash density="mdpi" height="470" orientation="portrait" src="images/320x470.png" width="320" />
+        <splash density="hdpi" height="640" orientation="portrait" src="images/480x640.png" width="480" />
+        <splash density="xhdpi" height="960" orientation="portrait" src="images/720x960.png" width="720" />
         <feature name="SocialSharing">
             <param name="android-package" value="nl.xservices.plugins.SocialSharing" />
         </feature>
