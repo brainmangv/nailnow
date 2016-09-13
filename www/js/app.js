@@ -86,7 +86,7 @@
         //backbutton
         document.addEventListener("backbutton", function(e){
             console.log('backbutton');
-            if($.afui.activeDiv.id=='main'){
+            if($.afui.activeDiv.id=='main' || $.afui.activeDiv.id=='manicure'){
                 e.preventDefault();
                 navigator.app.exitApp();
             }
@@ -475,7 +475,7 @@
                                 '<div class="col col3-4"><p>&nbsp; Item</p></div>'+
                                 '<div class="col col1-4 vertical-col center"><p>QTD</p></div>'+
                             '</div>';
-                            var servicos= r.servicos ? servicos.JSON.parse(r.servicos): null;
+                            var servicos= r.servicos ? JSON.parse(r.servicos): null;
                             if (servicos) servicos.forEach(function(s){
                                 html+='<div class="col col3-4 "><p class="border-bottom">'+s.descricao+'</p></div>'+
                             '<div class="col col1-4 last vertical-col center"><p class="border-bottom">'+s.qtd+'</p></div>';
@@ -629,6 +629,9 @@
                         '<div class="col col3-4"><p class="border-bottom">'+r.cidade+'</p></div>'+
                         '<div class="col col1-4 last"><p class="border-bottom">'+r.uf+'</p></div>'+
                         '<div class="col"><p class="border-bottom icon phone"><a href="tel:'+r.telefone+'" >'+r.telefone+'</a></p></div>'+
+                        '<div class="col"><p class="border-bottom icon location"><i class="fa fa-map" aria-hidden="true"></i>'+
+                        '<a href="#" onclick=window.open("google.navigation:q='+encodeURI(r.endereco+' '+r.numero+' - '+r.cidade+' - '+r.uf+'&mode=d')+
+                         '","_system");>Navegar no Google Maps</a></p></div>'+ 
                     '</li>'+
                     '</ul>'+
                     '<p class="grid-pad formGroupHead">Servicos</p>'+
@@ -638,7 +641,7 @@
                                 '<div class="col col3-4"><p>&nbsp; Item</p></div>'+
                                 '<div class="col col1-4 vertical-col center"><p>QTD</p></div>'+
                             '</div>';
-                             var servicos= r.servicos ? servicos.JSON.parse(r.servicos): null;
+                             var servicos= r.servicos ? JSON.parse(r.servicos): null;
                              if (servicos) servicos.forEach(function(s){
                                 html+='<div class="col col3-4 "><p class="border-bottom">'+s.descricao+'</p></div>'+
                                 '<div class="col col1-4 last vertical-col center"><p class="border-bottom">'+s.qtd+'</p></div>';
@@ -918,7 +921,7 @@
             if (order.tipo=="now")
                 confirmar_pedido_agora()
             else{
-               
+                agendar();
             }
         });
         
@@ -973,7 +976,7 @@
                 
             })
             .fail(function(e){
-                var message =typeof e.responseJSON !== 'undefined' ? e.responseJSON.detail : 'Erro no processamento';
+                var message =typeof e.response.JSON !== 'undefined' ? e.response.JSON.detail : 'Erro no processamento';
                 $.afui.popup({title:'Falha',message: message,cancelOnly:true,cancelText:'OK'})
             });
         }
