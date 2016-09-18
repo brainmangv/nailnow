@@ -406,7 +406,13 @@ var Map_cliente = function(){
         $oauth.getGeolocations()        
         .done(function(r){
             map_cliente.manicureMarks.deleteMarkers();            
-            console.log(r.locations[0],r.locations[1]);
+            var d= new Date(eval(r.locations[0].timestamp*1000));
+            var hora1= d.getHours()+':'+d.getMinutes()+':'+d.getSeconds();
+            //var d= new Date(eval(r.locations[1].timestamp*1000));
+            //var hora2= d.getHours()+':'+d.getMinutes()+':'+d.getSeconds();
+            console.log(r.locations[0].id,r.locations[0].latitude,r.locations[0].longitude,hora1,r.locations[0].timestamp);
+            //"\n",
+            //r.locations[1].id,r.locations[1].latitude,r.locations[1].longitude,hora2,r.locations[1].timestamp);
             r.locations.forEach(function(l){
                 var position =new google.maps.LatLng(l.latitude,  l.longitude);
                 
@@ -493,7 +499,7 @@ var  Map_manicure = function(){
     this.bgGeo = function(){
         var that=this;
         var callbackFn = function(location) {
-            $.afui.toast({message:location.latitude.toString()+','+location.longitude.toString(),position:'bc'});
+            $.afui.toast({message:location.latitude.toString()+','+location.longitude.toString(),position:'tc'});
             console.log('[js] BackgroundGeolocation callback:  ' + location.latitude + ',' + location.longitude);
             that.myMarker.setPosition({lat:location.latitude,lng:location.longitude});
             if(that.online) 
@@ -516,15 +522,22 @@ var  Map_manicure = function(){
         // BackgroundGeolocation is highly configurable. See platform specific configuration options
         
         backgroundGeolocation.configure(callbackFn, failureFn, {
-            desiredAccuracy: 0,
-            stationaryRadius: 0,
-            distanceFilter: 0,
-            //url: 'http://192.168.1.5:3000/locations',
+            desiredAccuracy: 1,
+            stationaryRadius: 10,
+            distanceFilter: 1,
+            stopOnStillActivity: false,
+            startForeground: true,
+            stopOnTerminate: false,
+            url: 'http://192.168.1.5:3000/locations',
             locationProvider: backgroundGeolocation.provider.ANDROID_ACTIVITY_PROVIDER,
+            activityType: 'AutomotiveNavigation',            
+            interval: 5000,
             fastestInterval: 5000,
-            activitiesInterval: 500,
+            activitiesInterval: 5000,
+            pauseLocationUpdates: false,
+            saveBatteryOnBackground: false,
             debug: true,
-            interval: 6000
+            
         });
 
         // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.

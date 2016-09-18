@@ -1444,3 +1444,16 @@ footer .button i{
     padding: 10px;
     text-align: center;
 }
+#cancel-order-btn{   
+    border: 1px solid;
+    width: 35px;
+    text-align: center;
+    border-radius: 49%;
+    bottom: 40px;
+    position: absolute;
+    left: calc(50% - 21px);
+    padding: 7px;
+    background: #AAA;
+    height: 35px;
+    font-weight: bolder;
+}
